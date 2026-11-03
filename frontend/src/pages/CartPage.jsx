@@ -220,17 +220,17 @@ export default function CartPage() {
                   {shipping === 0 ? 'FREE' : money(shipping)}
                 </dd>
               </div>
-              {shipping > 0 && (
-                <p className="summary__hint">
-                  Add {money(FREE_SHIPPING_THRESHOLD - subtotal)} more for free
-                  shipping
-                </p>
-              )}
               <div className="summary__row summary__row--total">
                 <dt>Total</dt>
                 <dd>{money(total)}</dd>
               </div>
             </dl>
+            {shipping > 0 && (
+              <p className="summary__hint">
+                Add {money(FREE_SHIPPING_THRESHOLD - subtotal)} more for free
+                shipping
+              </p>
+            )}
 
             <button
               type="button"
@@ -248,7 +248,7 @@ export default function CartPage() {
               <p className="field-error">{checkoutError}</p>
             )}
             <p className="summary__note muted">
-              Prices in USD. The cart is saved after refresh (redux-persist).
+              Prices in USD. Your cart is saved for next time.
             </p>
           </aside>
         </div>

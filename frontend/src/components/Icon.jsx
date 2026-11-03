@@ -15,6 +15,7 @@ const PATHS = {
   ),
   plus: <path d="M5 12h14M12 5v14" />,
   minus: <path d="M5 12h14" />,
+  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   x: <path d="M18 6 6 18M6 6l12 12" />,
   check: <path d="M20 6 9 17l-5-5" />,
   trash: (

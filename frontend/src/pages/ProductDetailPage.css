@@ -300,6 +300,13 @@
 }
 
 /* ============ Mobile ============ */
+@media (max-width: 640px) {
+  .specs__row {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}
+
 @media (max-width: 900px) {
   .pdetail {
     grid-template-columns: 1fr;

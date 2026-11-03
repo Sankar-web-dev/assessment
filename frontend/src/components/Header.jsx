@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCartItemCount } from '../store/selectors'
@@ -13,6 +14,8 @@ export default function Header() {
   const isAdmin = user?.role === 'admin'
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
 
   return (
     <header className="header">
@@ -42,24 +45,51 @@ export default function Header() {
           </form>
         )}
 
-        <nav className="header__nav">
+        {/* Compact cart shortcut — visible in the bar on mobile only */}
+        {!isAdmin && (
+          <NavLink to="/cart" className="header__cart header__cart--bar">
+            <Icon name="cart" size={20} />
+            <span>Cart</span>
+            {count > 0 && <span className="header__cart-count">{count}</span>}
+          </NavLink>
+        )}
+
+        <button
+          type="button"
+          className="header__menu-btn"
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          aria-controls="header-nav"
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <Icon name={menuOpen ? 'x' : 'menu'} size={22} />
+        </button>
+
+        <nav
+          className={`header__nav${menuOpen ? ' is-open' : ''}`}
+          id="header-nav"
+        >
           {!isAdmin && (
             <>
-              <NavLink to="/" className="header__link">
+              <NavLink to="/" className="header__link" onClick={closeMenu}>
                 Products
               </NavLink>
               {token && (
-                <NavLink to="/orders" className="header__link">
+                <NavLink
+                  to="/orders"
+                  className="header__link"
+                  onClick={closeMenu}
+                >
                   Orders
                 </NavLink>
               )}
             </>
           )}
-          <NavLink to="/admin" className="header__link">
+          <NavLink to="/admin" className="header__link" onClick={closeMenu}>
             Admin
           </NavLink>
           {!isAdmin && (
-            <NavLink to="/cart" className="header__cart">
+            <NavLink to="/cart" className="header__cart" onClick={closeMenu}>
               <Icon name="cart" size={20} />
               <span>Cart</span>
               {count > 0 && <span className="header__cart-count">{count}</span>}
@@ -85,7 +115,11 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <NavLink to="/login" className="header__link header__signin">
+            <NavLink
+              to="/login"
+              className="header__link header__signin"
+              onClick={closeMenu}
+            >
               Sign in
             </NavLink>
           )}

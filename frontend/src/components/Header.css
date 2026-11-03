@@ -146,12 +146,101 @@
   font: var(--text-caption);
 }
 
-@media (max-width: 640px) {
-  .header__inner {
-    gap: var(--space-3);
+.header__cart--bar,
+.header__menu-btn {
+  display: none;
+}
+.header__menu-btn {
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+.header__menu-btn:hover {
+  background: var(--color-gray-700);
+}
+
+.header__link.active {
+  color: var(--color-primary-100);
+}
+
+/* ============ Tablet & mobile ============ */
+@media (max-width: 900px) {
+  .header {
+    height: auto;
+    min-height: var(--header-height);
   }
-  .header__logo-text,
-  .header__user,
+  .header__inner {
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    row-gap: var(--space-3);
+    padding-block: var(--space-3);
+  }
+
+  /* Bar: logo · cart icon · hamburger  /  Row 2: search */
+  .header__cart--bar {
+    display: flex;
+    margin-left: auto;
+    order: 2;
+  }
+  .header__menu-btn {
+    display: inline-flex;
+    order: 3;
+  }
+  .header__search {
+    order: 4;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  /* Dropdown nav panel */
+  .header__nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    order: 5;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding-block: var(--space-2);
+    background: var(--color-gray-900);
+    border-top: 1px solid var(--color-gray-700);
+    box-shadow: var(--shadow-lg);
+  }
+  .header__nav.is-open {
+    display: flex;
+  }
+  .header__nav .header__link {
+    padding: var(--space-3) var(--page-padding);
+  }
+  /* cart lives in the bar — don't duplicate it inside the menu */
+  .header__nav .header__cart {
+    display: none;
+  }
+  .header__nav .header__account {
+    border-left: 0;
+    border-top: 1px solid var(--color-gray-700);
+    padding: var(--space-3) var(--page-padding);
+  }
+  .header__nav .header__signin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--control-md);
+    margin: var(--space-2) var(--page-padding) var(--space-3);
+    padding: 0;
+  }
+}
+
+@media (max-width: 640px) {
   .header__cart span:not(.header__cart-count) {
     display: none;
   }

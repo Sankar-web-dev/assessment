@@ -98,12 +98,6 @@
   margin-top: var(--space-8);
 }
 
-@media (min-width: 1280px) {
-  .catalog__grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 /* ============ Mobile ============ */
 @media (max-width: 1023px) {
   .catalog {

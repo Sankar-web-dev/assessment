@@ -76,7 +76,8 @@
 
 .card__price-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: auto;
 }
@@ -91,10 +92,23 @@
 }
 .card__stock {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-50);
   font: var(--text-caption);
   text-transform: none;
   letter-spacing: normal;
   color: var(--color-warning-700);
+}
+.card__stock::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
 }
 
 /* Skeleton variant */
