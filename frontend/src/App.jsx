@@ -8,7 +8,10 @@ import Footer from './components/Footer'
 import ProductListPage from './pages/ProductListPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
+import LoginPage from './pages/LoginPage'
+import OrdersPage from './pages/OrdersPage'
 import AdminLayout from './pages/admin/AdminLayout'
+import AdminOrders from './pages/admin/AdminOrders'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminCategories from './pages/admin/AdminCategories'
@@ -28,6 +31,8 @@ export default function App() {
                   <Route path="/" element={<ProductListPage />} />
                   <Route path="/product/:id" element={<ProductDetailPage />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/orders" element={<OrdersPage />} />
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<Navigate to="/admin/products" replace />} />
                     <Route path="products" element={<AdminProducts />} />
@@ -35,6 +40,7 @@ export default function App() {
                     <Route path="products/:id/edit" element={<AdminProductForm />} />
                     <Route path="categories" element={<AdminCategories />} />
                     <Route path="coupons" element={<AdminCoupons />} />
+                    <Route path="orders" element={<AdminOrders />} />
                   </Route>
                   <Route path="*" element={<ProductListPage />} />
                 </Routes>

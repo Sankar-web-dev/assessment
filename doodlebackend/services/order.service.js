@@ -94,6 +94,30 @@ class OrderService {
         };
     }
 
+    async getAllOrders(query) {
+        const pageNum = Math.max(1, parseInt(query.page, 10) || 1);
+        const limitNum = Math.min(50, Math.max(1, parseInt(query.limit, 10) || 10));
+
+        const [orders, total] = await Promise.all([
+            Order.find()
+                .populate("user", "name email")
+                .sort({ createdAt: -1 })
+                .skip((pageNum - 1) * limitNum)
+                .limit(limitNum),
+            Order.countDocuments(),
+        ]);
+
+        return {
+            orders,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum),
+            },
+        };
+    }
+
     async getOrderById(userId, orderId) {
         if (!mongoose.isValidObjectId(orderId)) {
             throw new ApiError(400, "Invalid order id");

@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { checkoutOrder, resetCheckout } from '../store/ordersSlice'
+import { useToast } from '../components/Toast'
 import {
   increase,
   decrease,
@@ -35,8 +37,28 @@ export default function CartPage() {
   const total = useSelector(selectTotal)
   const coupon = useSelector(selectCoupon)
   const couponError = useSelector(selectCouponError)
+  const token = useSelector((s) => s.auth.token)
+  const checkoutStatus = useSelector((s) => s.orders.checkoutStatus)
 
+  const navigate = useNavigate()
+  const showToast = useToast()
   const [code, setCode] = useState('')
+
+  const checkout = async () => {
+    if (!token) {
+      navigate('/login', { state: { from: '/cart' } })
+      return
+    }
+    const res = await dispatch(checkoutOrder())
+    if (checkoutOrder.fulfilled.match(res)) {
+      dispatch(clearCart())
+      dispatch(resetCheckout())
+      showToast('Order placed successfully', '/orders', 'View orders')
+      navigate('/orders')
+    } else {
+      showToast(res.payload || 'Order could not be placed')
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -210,8 +232,17 @@ export default function CartPage() {
               </div>
             </dl>
 
-            <button type="button" className="btn btn--primary btn--lg btn--block">
-              Proceed to checkout
+            <button
+              type="button"
+              className="btn btn--primary btn--lg btn--block"
+              disabled={checkoutStatus === 'placing'}
+              onClick={checkout}
+            >
+              {checkoutStatus === 'placing'
+                ? 'Placing order…'
+                : token
+                  ? 'Proceed to checkout'
+                  : 'Sign in to checkout'}
             </button>
             <p className="summary__note muted">
               Prices in USD. The cart is saved after refresh (redux-persist).

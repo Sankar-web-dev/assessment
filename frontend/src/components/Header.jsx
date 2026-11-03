@@ -8,6 +8,7 @@ import './Header.css'
 export default function Header() {
   const count = useSelector(selectCartItemCount)
   const search = useSelector((s) => s.products.search)
+  const token = useSelector((s) => s.auth.token)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 

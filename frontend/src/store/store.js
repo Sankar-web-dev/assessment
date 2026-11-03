@@ -12,6 +12,7 @@ import {
 import productsReducer from './productsSlice'
 import cartReducer from './cartSlice'
 import authReducer from './authSlice'
+import ordersReducer from './ordersSlice'
 
 // localStorage adapter for redux-persist. Defined explicitly instead of
 // importing 'redux-persist/lib/storage' — its CJS default export fails to
@@ -39,6 +40,7 @@ const store = configureStore({
     products: productsReducer,
     cart: persistReducer(cartPersistConfig, cartReducer),
     auth: persistReducer(authPersistConfig, authReducer),
+    orders: ordersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/coupons', label: 'Coupons' },
+  { to: '/admin/orders', label: 'Orders' },
 ]
 
 export default function AdminLayout() {

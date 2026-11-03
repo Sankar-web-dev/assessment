@@ -19,6 +19,15 @@ class OrderController {
         }
     }
 
+    async getAllOrders(req, res) {
+        try {
+            const result = await orderService.getAllOrders(req.query);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ message: error.message });
+        }
+    }
+
     async getOrderById(req, res) {
         try {
             const order = await orderService.getOrderById(req.user.id, req.params.id);
