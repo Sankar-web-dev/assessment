@@ -37,6 +37,8 @@
   overflow: hidden;
 }
 .pdetail__main img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -60,11 +62,13 @@
   margin-top: var(--space-3);
 }
 .pdetail__thumb {
+  position: relative;
   aspect-ratio: 1 / 1;
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-md);
   background: var(--color-gray-50);
   padding: var(--space-2);
+  overflow: hidden;
   transition: border-color var(--transition);
 }
 .pdetail__thumb.is-active {
@@ -72,9 +76,12 @@
   box-shadow: 0 0 0 1px var(--color-primary-600);
 }
 .pdetail__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  position: absolute;
+  inset: var(--space-2);
+  width: calc(100% - var(--space-4));
+  height: calc(100% - var(--space-4));
+  object-fit: cover;
+  border-radius: calc(var(--radius-md) - 2px);
 }
 
 /* ============ Info ============ */
