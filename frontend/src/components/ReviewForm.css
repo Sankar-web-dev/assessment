@@ -1,6 +1,7 @@
 .review-form {
   padding: 1.5rem;
-  background: var(--color-gray-50);
+  background: var(--surface);
+  border: 1px solid var(--color-gray-200);
   border-radius: 8px;
   margin-bottom: 2rem;
 }
@@ -31,13 +32,16 @@
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
+  background: var(--surface);
+  color: var(--color-gray-900);
   transition: border-color 0.2s;
 }
 
 .review-form__input:focus,
 .review-form__textarea:focus {
   outline: none;
-  border-color: var(--color-primary-700);
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .review-form__textarea {
