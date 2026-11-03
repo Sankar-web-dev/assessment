@@ -1,0 +1,19 @@
+.stars {
+  position: relative;
+  display: inline-flex;
+  line-height: 0;
+}
+
+.stars__row {
+  display: inline-flex;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.stars__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+}

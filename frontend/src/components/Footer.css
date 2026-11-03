@@ -1,0 +1,22 @@
+.footer {
+  margin-top: auto;
+  background: var(--color-gray-900);
+  color: var(--color-gray-300);
+}
+
+.footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--header-height);
+  font: var(--text-body-sm);
+  flex-wrap: wrap;
+}
+
+.footer__link {
+  color: var(--color-gray-300);
+}
+.footer__link:hover {
+  color: var(--color-white);
+}

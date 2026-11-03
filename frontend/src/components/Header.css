@@ -1,0 +1,109 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-height);
+  background: var(--color-gray-900);
+  box-shadow: var(--shadow-sm);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: 100%;
+}
+
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+.header__logo-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-600);
+  color: var(--color-white);
+  font: var(--text-caption);
+  font-size: 14px;
+}
+.header__logo-text {
+  font: var(--text-h3);
+  color: var(--color-white);
+}
+
+.header__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  max-width: 560px;
+  height: var(--control-md);
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-gray-500);
+}
+.header__search input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font: var(--text-body-sm);
+  color: var(--color-gray-900);
+  background: transparent;
+}
+.header__search:focus-within {
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-left: auto;
+}
+.header__link {
+  font: var(--text-label);
+  color: var(--color-white);
+}
+.header__link:hover {
+  color: var(--color-primary-100);
+}
+
+.header__cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-label);
+  color: var(--color-white);
+}
+.header__cart:hover {
+  color: var(--color-primary-100);
+}
+.header__cart-count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-600);
+  color: var(--color-white);
+  font: var(--text-caption);
+}
+
+@media (max-width: 640px) {
+  .header__inner {
+    gap: var(--space-3);
+  }
+  .header__logo-text,
+  .header__link,
+  .header__cart span:not(.header__cart-count) {
+    display: none;
+  }
+}

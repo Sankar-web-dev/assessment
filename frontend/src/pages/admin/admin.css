@@ -1,0 +1,188 @@
+/* ============ Admin layout ============ */
+.admin__head {
+  margin-bottom: var(--space-6);
+}
+
+.admin__tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.admin__tab {
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-label);
+  color: var(--color-gray-500);
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--transition),
+    border-color var(--transition);
+}
+.admin__tab:hover {
+  color: var(--color-primary-600);
+}
+.admin__tab.is-active {
+  color: var(--color-primary-600);
+  border-bottom-color: var(--color-primary-600);
+}
+
+/* ============ Panel / table ============ */
+.admin__panel {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  padding: var(--space-6);
+}
+.admin__panel--narrow {
+  max-width: 640px;
+}
+
+.admin__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.admin__panel-title {
+  font: var(--text-h2);
+}
+
+.admin__table-wrap {
+  overflow-x: auto;
+}
+.admin__table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-body-sm);
+}
+.admin__table th {
+  text-align: left;
+  font: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-gray-500);
+  padding: var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--color-gray-200);
+  white-space: nowrap;
+}
+.admin__table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-gray-100);
+  vertical-align: middle;
+  color: var(--color-gray-700);
+}
+.admin__table tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin__col-actions {
+  text-align: right !important;
+  white-space: nowrap;
+}
+.admin__col-actions .btn + .btn {
+  margin-left: var(--space-2);
+}
+
+.admin__row--deleted td {
+  opacity: 0.55;
+}
+
+.admin__product {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 200px;
+}
+.admin__thumb {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-50);
+  color: var(--color-gray-500);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.admin__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.admin__product-name {
+  font: var(--text-label);
+  color: var(--color-gray-900);
+}
+
+/* ============ Forms ============ */
+.admin__inline-form {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  max-width: 560px;
+}
+.admin__inline-form .input {
+  flex: 1;
+}
+
+.admin__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.admin__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.admin__grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.admin__textarea {
+  height: auto;
+  padding-block: var(--space-3);
+  resize: vertical;
+  font-family: var(--font-body);
+}
+.admin__form-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+/* ============ Coupon switch ============ */
+.admin__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-body-sm);
+  cursor: pointer;
+}
+.admin__switch input {
+  accent-color: var(--color-primary-600);
+  width: 16px;
+  height: 16px;
+}
+.admin__status--on {
+  color: var(--color-success-700);
+  font-weight: 600;
+}
+.admin__status--off {
+  color: var(--color-gray-500);
+}
+
+@media (max-width: 640px) {
+  .admin__grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .admin__inline-form {
+    flex-wrap: wrap;
+  }
+  .admin__panel {
+    padding: var(--space-4);
+  }
+}
