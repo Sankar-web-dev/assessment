@@ -78,7 +78,7 @@ export default function CartPage() {
             <p className="muted">
               Looks like you haven't added anything yet.
             </p>
-            <Link to="/" className="btn btn--primary btn--lg">
+            <Link to="/products" className="btn btn--primary btn--lg">
               Shop Now
               <Icon name="arrowRight" size={16} />
             </Link>
@@ -95,7 +95,7 @@ export default function CartPage() {
           <h1 className="page-title">
             Your Cart <span className="muted">({count} items)</span>
           </h1>
-          <Link to="/" className="cart__continue">
+          <Link to="/products" className="cart__continue">
             Continue Shopping
             <Icon name="arrowRight" size={16} />
           </Link>

@@ -80,21 +80,6 @@
   box-shadow: var(--glow-cyan);
 }
 
-.hero__dots {
-  display: flex;
-  gap: var(--space-2);
-  margin-top: var(--space-8);
-}
-.hero__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background: var(--hero-dot);
-}
-.hero__dot.is-active {
-  width: 22px;
-  background: var(--color-primary-600);
-}
 
 .hero__art {
   position: relative;
@@ -114,7 +99,6 @@
     rgba(139, 92, 246, 0.15) 55%,
     transparent 70%
   );
-  filter: blur(10px);
 }
 .hero__art img {
   position: relative;
@@ -216,41 +200,6 @@
   gap: var(--space-4);
   margin-bottom: var(--space-3);
   flex-wrap: wrap;
-}
-
-/* Quick-filter pill tabs (dark landing reference) */
-.ptabs {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-.ptabs__tab {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: var(--control-sm);
-  padding-inline: var(--space-4);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--color-gray-600);
-  font: var(--text-label);
-  transition:
-    border-color var(--transition),
-    color var(--transition),
-    background var(--transition),
-    box-shadow var(--transition);
-}
-.ptabs__tab:hover {
-  border-color: var(--color-primary-600);
-  color: var(--color-primary-700);
-}
-.ptabs__tab.is-active {
-  background: var(--grad-brand);
-  border-color: transparent;
-  color: var(--color-white);
-  box-shadow: var(--glow-primary);
 }
 
 .catalog__title {

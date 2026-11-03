@@ -7,7 +7,7 @@ import {
   clearDetail,
 } from '../store/productsSlice'
 import { selectAllProducts } from '../store/selectors'
-import { addToCart } from '../store/cartSlice'
+import { addToCart, increase, decrease } from '../store/cartSlice'
 import { discountedPrice, money } from '../utils/money'
 import { useToast } from '../components/Toast'
 import RatingStars from '../components/RatingStars'
@@ -32,7 +32,6 @@ export default function ProductDetailPage() {
   const detail = useSelector((s) => s.products.detail)
 
   const [imgIndex, setImgIndex] = useState(0)
-  const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('Description')
 
   // Prefer the already-loaded catalog; fall back to the detail fetch.
@@ -44,7 +43,6 @@ export default function ProductDetailPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
     setImgIndex(0)
-    setQty(1)
     setTab('Description')
     if (listStatus === 'idle') dispatch(fetchProducts())
     if (!catalogProduct && detail.status !== 'succeeded') {
@@ -101,13 +99,27 @@ export default function ProductDetailPage() {
   const stockClass =
     stock === 0 ? 'is-out' : stock < 10 ? 'is-low' : 'is-in'
 
+  // Stepper is bound to the cart: 0 when absent, 1+ once added.
+  const inCart = useSelector((s) =>
+    product ? s.cart.items[product.id] : null,
+  )
+  const cartQty = inCart?.qty ?? 0
+
+  const stepUp = () => {
+    if (inCart) dispatch(increase(product.id))
+    else dispatch(addToCart({ product, qty: 1 }))
+  }
+  const stepDown = () => {
+    if (inCart) dispatch(decrease(product.id))
+  }
+
   const add = () => {
-    dispatch(addToCart({ product, qty }))
+    dispatch(addToCart({ product, qty: 1 }))
     showToast('Added to cart', '/cart', 'View cart')
   }
 
   const buyNow = () => {
-    dispatch(addToCart({ product, qty }))
+    dispatch(addToCart({ product, qty: Math.max(cartQty, 1) }))
     navigate('/cart')
   }
 
@@ -133,7 +145,7 @@ export default function ProductDetailPage() {
                 <Icon name="home" size={16} />
               </Link>
               <Icon name="chevronRight" size={12} />
-              <Link to="/">{product.categoryName || product.category}</Link>
+              <Link to="/products">{product.categoryName || product.category}</Link>
               <Icon name="chevronRight" size={12} />
               <span className="breadcrumb__current">{product.title}</span>
             </nav>
@@ -212,10 +224,10 @@ export default function ProductDetailPage() {
                   <div className="pdetail__qty">
                     <span className="caption">Quantity</span>
                     <QuantityStepper
-                      value={qty}
+                      value={cartQty}
                       max={stock}
-                      onDecrease={() => setQty((q) => Math.max(1, q - 1))}
-                      onIncrease={() => setQty((q) => Math.min(stock, q + 1))}
+                      onDecrease={stepDown}
+                      onIncrease={stepUp}
                     />
                   </div>
                   <div className="pdetail__actions">

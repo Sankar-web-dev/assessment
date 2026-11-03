@@ -5,6 +5,7 @@ import store, { persistor } from './store/store'
 import { ToastProvider } from './components/Toast'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import LandingPage from './pages/LandingPage'
 import ProductListPage from './pages/ProductListPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
@@ -28,7 +29,8 @@ export default function App() {
               <Header />
               <main className="app__main">
                 <Routes>
-                  <Route path="/" element={<ProductListPage />} />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/products" element={<ProductListPage />} />
                   <Route path="/product/:id" element={<ProductDetailPage />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/login" element={<LoginPage />} />
@@ -42,7 +44,7 @@ export default function App() {
                     <Route path="coupons" element={<AdminCoupons />} />
                     <Route path="orders" element={<AdminOrders />} />
                   </Route>
-                  <Route path="*" element={<ProductListPage />} />
+                  <Route path="*" element={<LandingPage />} />
                 </Routes>
               </main>
               <Footer />

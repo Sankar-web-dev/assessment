@@ -38,7 +38,7 @@ export default function OrdersPage() {
       <div className="container">
         <div className="cart__head">
           <h1 className="page-title">My orders</h1>
-          <Link to="/" className="cart__continue">
+          <Link to="/products" className="cart__continue">
             <Icon name="arrowRight" size={16} style={{ transform: 'scaleX(-1)' }} />
             Continue shopping
           </Link>
@@ -89,7 +89,7 @@ export default function OrdersPage() {
           <div className="state-box">
             <Icon name="cart" size={40} />
             <p>No orders yet.</p>
-            <Link to="/" className="btn btn--primary">
+            <Link to="/products" className="btn btn--primary">
               Start shopping
             </Link>
           </div>

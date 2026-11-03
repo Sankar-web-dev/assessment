@@ -10,10 +10,8 @@ import './Header.css'
 
 const NAV = [
   { to: '/', label: 'Home', match: '' },
-  { to: '/?view=products', label: 'Products', match: 'view=products' },
-  { to: '/?cat=gaming', label: 'Gaming', match: 'cat=gaming' },
-  { to: '/?sort=deals', label: 'Deals', match: 'sort=deals' },
-  { to: '/#about', label: 'About', match: 'hash' },
+  { to: '/products', label: 'Products', match: 'path' },
+  { to: '/#about', label: 'About', match: 'hash:#about' },
 ]
 
 export default function Header() {
@@ -27,13 +25,18 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
 
-  const isActive = (match) =>
-    location.pathname === '/' &&
-    (match === 'hash'
-      ? location.hash === '#about'
-      : match
-        ? location.search.includes(match)
-        : location.search === '' && location.hash === '')
+  const isActive = (match) => {
+    if (match === 'path') return location.pathname === '/products'
+    if (match?.startsWith('hash:'))
+      return (
+        location.pathname === '/' && location.hash === match.slice(5)
+      )
+    return (
+      location.pathname === '/' &&
+      location.search === '' &&
+      location.hash === ''
+    )
+  }
 
   return (
     <header className="header">
@@ -65,7 +68,7 @@ export default function Header() {
             role="search"
             onSubmit={(e) => {
               e.preventDefault()
-              navigate('/')
+              navigate('/products')
             }}
           >
             <Icon name="search" size={20} />
@@ -151,13 +154,22 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <NavLink
-              to="/login"
-              className="header__link header__signin"
-              onClick={closeMenu}
-            >
-              Sign in
-            </NavLink>
+            <>
+              <NavLink
+                to="/login"
+                className="header__link header__login"
+                onClick={closeMenu}
+              >
+                Login
+              </NavLink>
+              <NavLink
+                to="/login"
+                className="header__link header__signin"
+                onClick={closeMenu}
+              >
+                Sign Up
+              </NavLink>
+            </>
           )}
         </nav>
       </div>

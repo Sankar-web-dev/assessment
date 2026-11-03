@@ -6,7 +6,6 @@
   background: var(--chrome);
   border-bottom: 1px solid var(--border-chrome);
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(10px);
 }
 
 .header__inner {
@@ -129,7 +128,7 @@
   align-items: center;
   gap: var(--space-2);
   padding-left: var(--space-4);
-  border-left: 1px solid var(--color-gray-600);
+  border-left: 1px solid var(--border-chrome);
 }
 .header__avatar {
   display: grid;
@@ -145,29 +144,46 @@
 }
 .header__user {
   font: var(--text-label);
-  color: var(--color-gray-300);
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--on-chrome);
   white-space: nowrap;
 }
 .header__logout {
-  border: 1px solid var(--color-gray-600);
+  border: 1px solid var(--border-chrome);
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--color-gray-300);
+  color: var(--on-chrome-dim);
   padding: 4px 10px;
   font: var(--text-caption);
   cursor: pointer;
+  transition:
+    border-color var(--transition),
+    color var(--transition);
 }
 .header__logout:hover {
-  border-color: var(--color-primary-100);
-  color: var(--color-primary-100);
+  border-color: var(--color-primary-600);
+  color: var(--color-primary-700);
+}
+.header__login {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-primary-600);
+  color: var(--color-primary-700);
+}
+.header__login::after {
+  display: none;
+}
+.header__login:hover {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
 }
 .header__signin {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   background: var(--color-primary-600);
+  color: var(--color-white);
+}
+.header__signin::after {
+  display: none;
 }
 .header__signin:hover {
   background: var(--color-primary-700);
@@ -326,13 +342,17 @@
     border-top: 1px solid var(--border-chrome);
     padding: var(--space-3) var(--page-padding);
   }
-  .header__nav .header__signin {
+  .header__nav .header__signin,
+  .header__nav .header__login {
     display: flex;
     align-items: center;
     justify-content: center;
     height: var(--control-md);
-    margin: var(--space-2) var(--page-padding) var(--space-3);
+    margin: var(--space-2) var(--page-padding);
     padding: 0;
+  }
+  .header__nav .header__login:last-child {
+    margin-bottom: var(--space-3);
   }
 }
 

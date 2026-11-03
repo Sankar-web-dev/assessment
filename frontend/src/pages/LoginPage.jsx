@@ -13,7 +13,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (token) {
-      navigate(location.state?.from || '/', { replace: true })
+      navigate(location.state?.from || '/products', { replace: true })
     }
   }, [token, navigate, location.state])
 

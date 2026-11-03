@@ -23,13 +23,6 @@ const SORTS = [
 
 const EMPTY_FILTERS = { categories: [], minPrice: '', maxPrice: '', minRating: 0 }
 
-const QUICK_TABS = [
-  { key: 'all', label: 'All', icon: 'grid' },
-  { key: 'electronics', label: 'Electronics', icon: 'monitor' },
-  { key: 'gaming', label: 'Gaming', icon: 'gamepad' },
-  { key: 'deals', label: 'Deals', icon: 'tag' },
-]
-
 // Search-driven category cards (matches the reference's type tiles)
 const POPULAR = [
   { label: 'Laptops', q: 'laptop' },
@@ -150,31 +143,6 @@ export default function ProductListPage() {
     setPage(1)
   }
 
-  const quickTab = (key) => {
-    if (key === 'all') {
-      setDraft(EMPTY_FILTERS)
-      setApplied(EMPTY_FILTERS)
-      dispatch(setSearch(''))
-      setSort('featured')
-    } else if (key === 'deals') {
-      setApplied((a) => ({ ...a, categories: [] }))
-      setDraft((d) => ({ ...d, categories: [] }))
-      setSort('deals')
-    } else {
-      setApplied((a) => ({ ...a, categories: [key] }))
-      setDraft((d) => ({ ...d, categories: [key] }))
-      if (sort === 'deals') setSort('featured')
-    }
-    setPage(1)
-  }
-
-  const tabActive = (key) =>
-    key === 'all'
-      ? applied.categories.length === 0 && sort !== 'deals' && !search.trim()
-      : key === 'deals'
-        ? sort === 'deals'
-        : applied.categories.includes(key)
-
   const catName = (slug) =>
     categories.find((c) => c.slug === slug)?.name ?? slug
 
@@ -243,11 +211,6 @@ export default function ProductListPage() {
               Shop Now
               <Icon name="arrowRight" size={16} />
             </a>
-            <div className="hero__dots" aria-hidden="true">
-              <span className="hero__dot is-active" />
-              <span className="hero__dot" />
-              <span className="hero__dot" />
-            </div>
           </div>
           <div className="hero__art">
             {featured && (
@@ -308,19 +271,7 @@ export default function ProductListPage() {
 
           <div className="catalog__main">
             <div className="catalog__toolbar">
-              <div className="ptabs" role="tablist" aria-label="Quick filters">
-                {QUICK_TABS.map((t) => (
-                  <button
-                    key={t.key}
-                    type="button"
-                    className={`ptabs__tab${tabActive(t.key) ? ' is-active' : ''}`}
-                    onClick={() => quickTab(t.key)}
-                  >
-                    <Icon name={t.icon} size={16} />
-                    {t.label}
-                  </button>
-                ))}
-              </div>
+              <h2 className="catalog__title">All products</h2>
               <label className="catalog__sort">
                 <span className="muted">Sort by:</span>
                 <select

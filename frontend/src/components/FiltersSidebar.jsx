@@ -38,6 +38,17 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
       <section className="filters__group">
         <h3 className="caption filters__label">Category</h3>
         <ul className="filters__list">
+          <li>
+            <label className="filters__option">
+              <input
+                type="radio"
+                name="category-all"
+                checked={draft.categories.length === 0}
+                onChange={() => onChange({ ...draft, categories: [] })}
+              />
+              <span>All products</span>
+            </label>
+          </li>
           {categories.map((c) => (
             <li key={c.slug}>
               <label className="filters__option">
