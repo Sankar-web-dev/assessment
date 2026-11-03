@@ -1,40 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { api } from '../api/client'
-
-export const login = createAsyncThunk(
-  'auth/login',
-  async ({ email, password }, { rejectWithValue }) => {
-    try {
-      // POST /api/v1/login -> { user, token }
-      return await api('/login', {
-        method: 'POST',
-        body: { email, password },
-      })
-    } catch (err) {
-      return rejectWithValue(err.message)
-    }
-  },
-)
-
-export const signup = createAsyncThunk(
-  'auth/signup',
-  async ({ name, email, password }, { rejectWithValue }) => {
-    try {
-      // POST /api/v1/signup -> user (no token; log in afterwards)
-      await api('/signup', {
-        method: 'POST',
-        body: { name, email, password },
-      })
-      const session = await api('/login', {
-        method: 'POST',
-        body: { email, password },
-      })
-      return session
-    } catch (err) {
-      return rejectWithValue(err.message)
-    }
-  },
-)
 
 const initialState = {
   token: null,
@@ -56,30 +21,63 @@ const authSlice = createSlice({
     clearAuthError(state) {
       state.error = null
     },
-  },
-  extraReducers: (builder) => {
-    const pending = (state) => {
+    // Plain status actions — the thunks below dispatch these.
+    authLoading(state) {
       state.status = 'loading'
       state.error = null
-    }
-    const fulfilled = (state, action) => {
+    },
+    authSuccess(state, action) {
       state.status = 'succeeded'
       state.token = action.payload.token
       state.user = action.payload.user
-    }
-    const rejected = (state, action) => {
+    },
+    authFailed(state, action) {
       state.status = 'failed'
       state.error = action.payload || 'Authentication failed'
-    }
-    builder
-      .addCase(login.pending, pending)
-      .addCase(login.fulfilled, fulfilled)
-      .addCase(login.rejected, rejected)
-      .addCase(signup.pending, pending)
-      .addCase(signup.fulfilled, fulfilled)
-      .addCase(signup.rejected, rejected)
+    },
   },
 })
 
-export const { logout, clearAuthError } = authSlice.actions
+export const { logout, clearAuthError, authLoading, authSuccess, authFailed } =
+  authSlice.actions
+
+// ---- Plain thunks (async action creators) --------------------
+// POST /api/v1/login -> { user, token } — stored via authSuccess.
+// Returns the session on success, null on failure.
+
+export const login = ({ email, password }) => async (dispatch) => {
+  dispatch(authLoading())
+  try {
+    const session = await api('/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+    dispatch(authSuccess(session))
+    return session
+  } catch (err) {
+    dispatch(authFailed(err.message))
+    return null
+  }
+}
+
+// POST /api/v1/signup (no token back) then log in automatically.
+export const signup = ({ name, email, password }) => async (dispatch) => {
+  dispatch(authLoading())
+  try {
+    await api('/signup', {
+      method: 'POST',
+      body: { name, email, password },
+    })
+    const session = await api('/login', {
+      method: 'POST',
+      body: { email, password },
+    })
+    dispatch(authSuccess(session))
+    return session
+  } catch (err) {
+    dispatch(authFailed(err.message))
+    return null
+  }
+}
+
 export default authSlice.reducer

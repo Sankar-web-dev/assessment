@@ -73,8 +73,7 @@ export const {
   removeCoupon,
 } = cartSlice.actions
 
-// Thunk: validate the entered code against the backend coupon API.
-// POST /api/v1/coupons/validate -> { code, discountPercent, discount }
+
 export const applyCoupon = (rawCode) => async (dispatch, getState) => {
   const code = String(rawCode || '').trim().toUpperCase()
   if (!code) {

@@ -7,9 +7,9 @@ router.use(authMiddleware);
 
 router.post('/', orderController.createOrder);
 router.get('/', orderController.getMyOrders);
-router.get('/all', orderController.getAllOrders);
+router.get('/all', authMiddleware.requireAdmin, orderController.getAllOrders);
 router.get('/:id', orderController.getOrderById);
 router.post('/:id/cancel', orderController.cancelOrder);
-router.patch('/:id/status', orderController.updateOrderStatus);
+router.patch('/:id/status', authMiddleware.requireAdmin, orderController.updateOrderStatus);
 
 module.exports = router;

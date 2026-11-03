@@ -7,6 +7,7 @@ const authMiddleware = require("../middleware/auth.middleware");
 router.post('/validate', couponController.previewCoupon);
 
 router.use(authMiddleware);
+router.use(authMiddleware.requireAdmin);
 
 router.get('/', couponController.getCoupons);
 router.post('/', couponController.createCoupon);

@@ -39,6 +39,7 @@ export default function CartPage() {
   const couponError = useSelector(selectCouponError)
   const token = useSelector((s) => s.auth.token)
   const checkoutStatus = useSelector((s) => s.orders.checkoutStatus)
+  const checkoutError = useSelector((s) => s.orders.checkoutError)
 
   const navigate = useNavigate()
   const showToast = useToast()
@@ -55,14 +56,13 @@ export default function CartPage() {
       navigate('/login', { state: { from: '/cart' } })
       return
     }
-    const res = await dispatch(checkoutOrder())
-    if (checkoutOrder.fulfilled.match(res)) {
+    // checkoutOrder() returns the new order, or null if it failed
+    const order = await dispatch(checkoutOrder())
+    if (order) {
       dispatch(clearCart())
       dispatch(resetCheckout())
       showToast('Order placed successfully', '/orders', 'View orders')
       navigate('/orders')
-    } else {
-      showToast(res.payload || 'Order could not be placed')
     }
   }
 
@@ -232,17 +232,17 @@ export default function CartPage() {
                   <dd>{money(savings)}</dd>
                 </div>
               )}
-              {shipping > 0 && (
-                <p className="summary__hint">
-                  Add {money(FREE_SHIPPING_THRESHOLD - subtotal)} more for free
-                  shipping
-                </p>
-              )}
               <div className="summary__row summary__row--total">
                 <dt>Total</dt>
                 <dd>{money(total)}</dd>
               </div>
             </dl>
+            {shipping > 0 && (
+              <p className="summary__hint">
+                Add {money(FREE_SHIPPING_THRESHOLD - subtotal)} more for free
+                shipping
+              </p>
+            )}
 
             <button
               type="button"
@@ -256,8 +256,11 @@ export default function CartPage() {
                   ? 'Proceed to Checkout'
                   : 'Sign in to checkout'}
             </button>
+            {checkoutError && (
+              <p className="field-error">{checkoutError}</p>
+            )}
             <p className="summary__note muted">
-              Prices in USD. The cart is saved after refresh (redux-persist).
+              Prices in USD. Your cart is saved for next time.
             </p>
           </aside>
         </div>

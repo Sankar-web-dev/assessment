@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
-import AdminLogin from './admin/AdminLogin'
+import LoginForm from '../components/LoginForm'
 import './admin/admin.css'
 
 // Generic sign-in page for shoppers (checkout requires an account).
@@ -23,7 +23,7 @@ export default function LoginPage() {
         <div className="admin__head">
           <h1 className="page-title">Sign in</h1>
         </div>
-        <AdminLogin />
+        <LoginForm />
       </div>
     </div>
   )
