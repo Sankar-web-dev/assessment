@@ -15,7 +15,7 @@ export default function AdminLayout() {
   const dispatch = useDispatch()
   const { token, user } = useSelector((s) => s.auth)
 
-  if (!token) {
+  if (!token || user?.role !== 'admin') {
     return (
       <div className="page">
         <div className="container">

@@ -24,4 +24,13 @@ function authMiddleware (req,res,next)
     }
 }
 
+// Use after authMiddleware — rejects non-admin JWTs (403).
+function requireAdmin(req, res, next) {
+    if (req.user?.role !== "admin") {
+        return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+}
+
 module.exports = authMiddleware;
+module.exports.requireAdmin = requireAdmin;

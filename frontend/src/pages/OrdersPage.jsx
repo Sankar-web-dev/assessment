@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchMyOrders, cancelOrder } from '../store/ordersSlice'
@@ -14,14 +14,21 @@ const STATUS_CHIP = {
   cancelled: 'admin__status--off',
 }
 
+const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+
 export default function OrdersPage() {
   const dispatch = useDispatch()
   const token = useSelector((s) => s.auth.token)
   const { myOrders, myStatus, myError } = useSelector((s) => s.orders)
+  const [filter, setFilter] = useState('all')
 
+  // Refetch on every visit so admin-side status changes are reflected
   useEffect(() => {
-    if (token && myStatus === 'idle') dispatch(fetchMyOrders())
-  }, [dispatch, token, myStatus])
+    if (token) dispatch(fetchMyOrders())
+  }, [dispatch, token])
+
+  const visibleOrders =
+    filter === 'all' ? myOrders : myOrders.filter((o) => o.status === filter)
 
   if (!token) return <Navigate to="/login" state={{ from: '/orders' }} replace />
 
@@ -35,6 +42,24 @@ export default function OrdersPage() {
             Continue shopping
           </Link>
         </div>
+
+        {myStatus !== 'idle' && (
+          <nav className="admin__tabs" style={{ marginBottom: 'var(--space-4)' }}>
+            {['all', ...STATUSES].map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={`admin__tab${filter === s ? ' is-active' : ''}`}
+                onClick={() => setFilter(s)}
+              >
+                {s === 'all' ? 'All' : s}{' '}
+                {s === 'all'
+                  ? `(${myOrders.length})`
+                  : `(${myOrders.filter((o) => o.status === s).length})`}
+              </button>
+            ))}
+          </nav>
+        )}
 
         {myStatus === 'loading' && (
           <div className="state-box">
@@ -67,7 +92,15 @@ export default function OrdersPage() {
           </div>
         )}
 
-        {myOrders.map((o) => (
+        {myStatus === 'succeeded' &&
+          myOrders.length > 0 &&
+          visibleOrders.length === 0 && (
+            <div className="state-box">
+              <p className="muted">No {filter} orders.</p>
+            </div>
+          )}
+
+        {visibleOrders.map((o) => (
           <div key={o._id} className="admin__panel" style={{ marginBottom: 'var(--space-4)' }}>
             <div className="admin__panel-head">
               <div>

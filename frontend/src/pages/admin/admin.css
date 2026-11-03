@@ -197,6 +197,12 @@
   width: 16px;
   height: 16px;
 }
+button.admin__tab {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
 .admin__status--on {
   color: var(--color-success-700);
   font-weight: 600;

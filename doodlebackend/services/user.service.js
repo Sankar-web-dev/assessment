@@ -29,12 +29,13 @@ class UserService
         {   
             throw new Error("User is not active");
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid =
+            user.password && (await bcrypt.compare(password, user.password));
         if(!isPasswordValid)
         {
             throw new Error("Invalid password");
         }
-        const payload = { id: user._id, email: user.email ,isActive :user.isActive};
+        const payload = { id: user._id, email: user.email, isActive: user.isActive, role: user.role };
         const token = tokenService.generateToken(payload);
         const userWithoutPassword = user.toObject();
         delete userWithoutPassword.password;
