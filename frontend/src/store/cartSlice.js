@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { api } from '../api/client'
+import { selectSubtotal } from './selectors'
 
 const initialState = {
   // keyed by product id: { id, title, price, discountPercentage, thumbnail, stock, category, qty }
@@ -19,10 +21,11 @@ const cartSlice = createSlice({
         id: product.id,
         title: product.title,
         price: product.price,
+        sellingPrice: product.sellingPrice,
         discountPercentage: product.discountPercentage || 0,
         thumbnail: product.thumbnail,
         stock: product.stock,
-        category: product.category,
+        category: product.categoryName || product.category,
         qty: Math.min(nextQty, product.stock ?? nextQty),
       }
     },
@@ -70,20 +73,22 @@ export const {
   removeCoupon,
 } = cartSlice.actions
 
-// Thunk: validate the entered code against the admin-managed coupon list.
-export const applyCoupon = (rawCode) => (dispatch, getState) => {
+// Thunk: validate the entered code against the backend coupon API.
+// POST /api/v1/coupons/validate -> { code, discountPercent, discount }
+export const applyCoupon = (rawCode) => async (dispatch, getState) => {
   const code = String(rawCode || '').trim().toUpperCase()
   if (!code) {
     dispatch(removeCoupon())
     return
   }
-  const match = getState().admin.coupons.find(
-    (c) => c.code === code && c.active,
-  )
-  if (match) {
-    dispatch(couponApplied({ code: match.code, percent: match.percent }))
-  } else {
-    dispatch(couponRejected('Invalid coupon code'))
+  try {
+    const data = await api('/coupons/validate', {
+      method: 'POST',
+      body: { code, subtotal: selectSubtotal(getState()) },
+    })
+    dispatch(couponApplied({ code: data.code, percent: data.discountPercent }))
+  } catch (err) {
+    dispatch(couponRejected(err.message || 'Invalid coupon code'))
   }
 }
 

@@ -46,6 +46,32 @@ class CouponService {
             discount: round2((subtotal * coupon.discountPercent) / 100),
         };
     }
+
+    async updateCoupon(id, data) {
+        const allowed = ["code", "discountPercent", "minOrderAmount", "expiresAt", "isActive"];
+        const payload = {};
+        for (const field of allowed) {
+            if (data[field] !== undefined) payload[field] = data[field];
+        }
+        if (payload.code) payload.code = payload.code.trim().toUpperCase();
+        const coupon = await Coupon.findByIdAndUpdate(
+            id,
+            { $set: payload },
+            { new: true, runValidators: true }
+        );
+        if (!coupon) {
+            throw new ApiError(404, "Coupon not found");
+        }
+        return coupon;
+    }
+
+    async deleteCoupon(id) {
+        const coupon = await Coupon.findByIdAndDelete(id);
+        if (!coupon) {
+            throw new ApiError(404, "Coupon not found");
+        }
+        return { message: "Coupon deleted successfully" };
+    }
 }
 
 module.exports = new CouponService();

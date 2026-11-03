@@ -25,20 +25,19 @@ export default function ProductDetailPage() {
   const navigate = useNavigate()
   const showToast = useToast()
 
-  const numericId = Number(id)
   const allProducts = useSelector(selectAllProducts)
   const listStatus = useSelector((s) => s.products.status)
   const detail = useSelector((s) => s.products.detail)
-  const isDeleted = useSelector((s) => s.admin.deletedIds.includes(numericId))
 
   const [imgIndex, setImgIndex] = useState(0)
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('Description')
 
-  // Prefer the merged catalog (covers admin-created and admin-edited products).
-  const catalogProduct = allProducts.find((p) => p.id === numericId)
+  // Prefer the already-loaded catalog; fall back to the detail fetch.
+  const catalogProduct = allProducts.find((p) => String(p.id) === String(id))
   const product =
-    catalogProduct ?? (detail.data?.id === numericId ? detail.data : null)
+    catalogProduct ??
+    (String(detail.data?.id) === String(id) ? detail.data : null)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -46,7 +45,7 @@ export default function ProductDetailPage() {
     setQty(1)
     setTab('Description')
     if (listStatus === 'idle') dispatch(fetchProducts())
-    if (!catalogProduct && !isDeleted && detail.status !== 'succeeded') {
+    if (!catalogProduct && detail.status !== 'succeeded') {
       dispatch(fetchProductById(id))
     }
     return () => dispatch(clearDetail())
@@ -63,12 +62,8 @@ export default function ProductDetailPage() {
     [allProducts, product],
   )
 
-  const status = product
-    ? 'succeeded'
-    : isDeleted
-      ? 'failed'
-      : detail.status
-  const error = isDeleted ? 'Product not found.' : detail.error
+  const status = product ? 'succeeded' : detail.status
+  const error = detail.error
 
   if (status === 'failed') {
     return (
@@ -83,7 +78,7 @@ export default function ProductDetailPage() {
               style={{ background: 'var(--color-danger-700)', color: 'var(--color-white)' }}
               onClick={() => {
                 dispatch(fetchProducts())
-                if (!isDeleted) dispatch(fetchProductById(id))
+                dispatch(fetchProductById(id))
               }}
             >
               Retry
@@ -185,8 +180,8 @@ export default function ProductDetailPage() {
                 <div className="pdetail__rating">
                   <RatingStars rating={product.rating} />
                   <span>
-                    {product.rating?.toFixed(1)} · {product.reviews?.length ?? 0}{' '}
-                    reviews
+                    {product.rating?.toFixed(1)} ·{' '}
+                    {product.reviewCount ?? product.reviews?.length ?? 0} reviews
                   </span>
                   {product.brand && (
                     <span className="muted">· Brand: {product.brand}</span>
@@ -280,7 +275,7 @@ export default function ProductDetailPage() {
                     onClick={() => setTab(t)}
                   >
                     {t === 'Reviews'
-                      ? `Reviews (${product.reviews?.length ?? 0})`
+                      ? `Reviews (${product.reviewCount ?? product.reviews?.length ?? 0})`
                       : t}
                   </button>
                 ))}
@@ -295,16 +290,9 @@ export default function ProductDetailPage() {
                   <dl className="specs">
                     {[
                       ['Brand', product.brand],
-                      ['SKU', product.sku],
-                      ['Category', product.category],
-                      ['Weight', product.weight && `${product.weight} kg`],
-                      [
-                        'Dimensions',
-                        product.dimensions &&
-                          `${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm`,
-                      ],
+                      ['Category', product.categoryName || product.category],
+                      ...Object.entries(product.specifications || {}),
                       ['Warranty', product.warrantyInformation],
-                      ['Shipping', product.shippingInformation],
                       ['Availability', product.availabilityStatus],
                       ['Return policy', product.returnPolicy],
                     ]
@@ -312,7 +300,7 @@ export default function ProductDetailPage() {
                       .map(([k, v]) => (
                         <div key={k} className="specs__row">
                           <dt>{k}</dt>
-                          <dd>{v}</dd>
+                          <dd>{String(v)}</dd>
                         </div>
                       ))}
                   </dl>

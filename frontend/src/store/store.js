@@ -9,10 +9,18 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
 import productsReducer from './productsSlice'
 import cartReducer from './cartSlice'
-import adminReducer from './adminSlice'
+import authReducer from './authSlice'
+
+// localStorage adapter for redux-persist. Defined explicitly instead of
+// importing 'redux-persist/lib/storage' — its CJS default export fails to
+// unwrap under Vite, producing "storage.getItem is not a function".
+const storage = {
+  getItem: (key) => Promise.resolve(localStorage.getItem(key)),
+  setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
+  removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
+}
 
 const cartPersistConfig = {
   key: 'kadai-cart',
@@ -20,16 +28,17 @@ const cartPersistConfig = {
   whitelist: ['items', 'coupon'],
 }
 
-const adminPersistConfig = {
-  key: 'kadai-admin',
+const authPersistConfig = {
+  key: 'kadai-auth',
   storage,
+  whitelist: ['token', 'user'],
 }
 
 const store = configureStore({
   reducer: {
     products: productsReducer,
     cart: persistReducer(cartPersistConfig, cartReducer),
-    admin: persistReducer(adminPersistConfig, adminReducer),
+    auth: persistReducer(authPersistConfig, authReducer),
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

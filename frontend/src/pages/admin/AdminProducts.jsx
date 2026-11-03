@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts } from '../../store/productsSlice'
-import { deleteProduct, restoreProduct } from '../../store/adminSlice'
+import { deleteProductApi } from '../../api/adminApi'
 import { selectAllProducts } from '../../store/selectors'
 import { discountedPrice, money } from '../../utils/money'
 import Icon from '../../components/Icon'
@@ -11,30 +11,36 @@ export default function AdminProducts() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const products = useSelector(selectAllProducts)
-  const deletedIds = useSelector((s) => s.admin.deletedIds)
-  const customProducts = useSelector((s) => s.admin.customProducts)
-  const isCustom = (id) => customProducts.some((c) => c.id === id)
-  const allApiItems = useSelector((s) => s.products.items)
   const status = useSelector((s) => s.products.status)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (status === 'idle') dispatch(fetchProducts())
   }, [dispatch, status])
 
-  const deleted = allApiItems.filter((p) => deletedIds.includes(p.id))
+  const remove = async (p) => {
+    setError('')
+    try {
+      await dispatch(deleteProductApi(p.id))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
   return (
     <div className="admin__panel">
       <div className="admin__panel-head">
         <div>
           <h2 className="admin__panel-title">Products</h2>
-          <p className="muted">{products.length} live products</p>
+          <p className="muted">{products.length} active products</p>
         </div>
         <Link to="/admin/products/new" className="btn btn--primary">
           <Icon name="plus" size={16} />
           Add product
         </Link>
       </div>
+
+      {error && <p className="field-error">{error}</p>}
 
       <div className="admin__table-wrap">
         <table className="admin__table">
@@ -44,7 +50,6 @@ export default function AdminProducts() {
               <th>Category</th>
               <th>Price</th>
               <th>Stock</th>
-              <th>Source</th>
               <th className="admin__col-actions">Actions</th>
             </tr>
           </thead>
@@ -64,7 +69,7 @@ export default function AdminProducts() {
                   </div>
                 </td>
                 <td className="caption" style={{ textTransform: 'uppercase' }}>
-                  {p.category}
+                  {p.categoryName || p.category}
                 </td>
                 <td>
                   {money(discountedPrice(p))}
@@ -73,11 +78,6 @@ export default function AdminProducts() {
                   )}
                 </td>
                 <td>{p.stock}</td>
-                <td>
-                  <span className={`chip${isCustom(p.id) ? ' chip--active' : ''}`}>
-                    {isCustom(p.id) ? 'Custom' : 'API'}
-                  </span>
-                </td>
                 <td className="admin__col-actions">
                   <button
                     type="button"
@@ -89,44 +89,20 @@ export default function AdminProducts() {
                   <button
                     type="button"
                     className="btn btn--danger btn--sm"
-                    onClick={() => dispatch(deleteProduct(p.id))}
+                    onClick={() => remove(p)}
                   >
                     Delete
                   </button>
                 </td>
               </tr>
             ))}
-            {deleted.map((p) => (
-              <tr key={p.id} className="admin__row--deleted">
-                <td>
-                  <div className="admin__product">
-                    <span className="admin__thumb">
-                      {p.thumbnail ? (
-                        <img src={p.thumbnail} alt="" />
-                      ) : (
-                        <Icon name="image" size={16} />
-                      )}
-                    </span>
-                    <span className="admin__product-name">{p.title}</span>
-                  </div>
-                </td>
-                <td className="caption">{p.category}</td>
-                <td>{money(p.price)}</td>
-                <td>{p.stock}</td>
-                <td>
-                  <span className="chip">Deleted</span>
-                </td>
-                <td className="admin__col-actions">
-                  <button
-                    type="button"
-                    className="btn btn--secondary btn--sm"
-                    onClick={() => dispatch(restoreProduct(p.id))}
-                  >
-                    Restore
-                  </button>
+            {products.length === 0 && status === 'succeeded' && (
+              <tr>
+                <td colSpan={5} className="muted" style={{ textAlign: 'center' }}>
+                  No products — add one or run the backend seed.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

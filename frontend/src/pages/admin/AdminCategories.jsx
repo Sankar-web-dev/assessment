@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchCategories, fetchProducts } from '../../store/productsSlice'
 import {
-  addCategory,
-  updateCategory,
-  deleteCategory,
-} from '../../store/adminSlice'
+  createCategoryApi,
+  updateCategoryApi,
+  deleteCategoryApi,
+} from '../../api/adminApi'
 import { selectAllCategories, selectAllProducts } from '../../store/selectors'
 import Icon from '../../components/Icon'
 
@@ -13,37 +13,53 @@ export default function AdminCategories() {
   const dispatch = useDispatch()
   const categories = useSelector(selectAllCategories)
   const products = useSelector(selectAllProducts)
-  const status = useSelector((s) => s.products.categoriesStatus)
+  const catStatus = useSelector((s) => s.products.categoriesStatus)
   const listStatus = useSelector((s) => s.products.status)
 
   const [newName, setNewName] = useState('')
-  const [editing, setEditing] = useState(null) // slug being edited
+  const [editing, setEditing] = useState(null) // category _id being edited
   const [editName, setEditName] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (status === 'idle') dispatch(fetchCategories())
+    if (catStatus === 'idle') dispatch(fetchCategories())
     if (listStatus === 'idle') dispatch(fetchProducts())
-  }, [dispatch, status, listStatus])
+  }, [dispatch, catStatus, listStatus])
 
   const usageCount = (slug) =>
     products.filter((p) => p.category === slug).length
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     const name = newName.trim()
     if (!name) return
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '')
-    if (categories.some((c) => c.slug === slug)) {
-      setError('Category already exists')
-      return
-    }
-    dispatch(addCategory({ name, slug }))
-    setNewName('')
     setError('')
+    try {
+      await dispatch(createCategoryApi({ name }))
+      setNewName('')
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const saveEdit = async (c) => {
+    setError('')
+    try {
+      await dispatch(updateCategoryApi(c._id, { name: editName.trim() }))
+      setEditing(null)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const remove = async (c) => {
+    setError('')
+    try {
+      await dispatch(deleteCategoryApi(c._id))
+    } catch (err) {
+      // e.g. "Category has N product(s) and cannot be deleted"
+      setError(err.message)
+    }
   }
 
   return (
@@ -79,15 +95,14 @@ export default function AdminCategories() {
               <th>Name</th>
               <th>Slug</th>
               <th>Products</th>
-              <th>Source</th>
               <th className="admin__col-actions">Actions</th>
             </tr>
           </thead>
           <tbody>
             {categories.map((c) => (
-              <tr key={c.slug}>
+              <tr key={c._id}>
                 <td>
-                  {editing === c.slug ? (
+                  {editing === c._id ? (
                     <input
                       className="input"
                       style={{ height: 'var(--control-sm)', width: 200 }}
@@ -101,64 +116,55 @@ export default function AdminCategories() {
                 </td>
                 <td className="muted">{c.slug}</td>
                 <td>{usageCount(c.slug)}</td>
-                <td>
-                  <span className={`chip${c.source === 'custom' ? ' chip--active' : ''}`}>
-                    {c.source === 'custom' ? 'Custom' : 'API'}
-                  </span>
-                </td>
                 <td className="admin__col-actions">
-                  {c.source === 'custom' ? (
-                    editing === c.slug ? (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn--primary btn--sm"
-                          onClick={() => {
-                            dispatch(
-                              updateCategory({ slug: c.slug, name: editName }),
-                            )
-                            setEditing(null)
-                          }}
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn--ghost btn--sm"
-                          onClick={() => setEditing(null)}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className="btn btn--ghost btn--sm"
-                          onClick={() => {
-                            setEditing(c.slug)
-                            setEditName(c.name)
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn--danger btn--sm"
-                          onClick={() => dispatch(deleteCategory(c.slug))}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )
+                  {editing === c._id ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn--primary btn--sm"
+                        onClick={() => saveEdit(c)}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        onClick={() => setEditing(null)}
+                      >
+                        Cancel
+                      </button>
+                    </>
                   ) : (
-                    <span className="muted" style={{ fontSize: 12 }}>
-                      From API
-                    </span>
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        onClick={() => {
+                          setEditing(c._id)
+                          setEditName(c.name)
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn--danger btn--sm"
+                        onClick={() => remove(c)}
+                      >
+                        Delete
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
             ))}
+            {categories.length === 0 && catStatus === 'succeeded' && (
+              <tr>
+                <td colSpan={4} className="muted" style={{ textAlign: 'center' }}>
+                  No categories yet — add one above.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

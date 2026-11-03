@@ -51,7 +51,8 @@ export default function ProductCard({ product }) {
         <div className="card__rating">
           <RatingStars rating={product.rating} />
           <span className="card__rating-text">
-            {product.rating?.toFixed(1)} ({product.reviews?.length ?? 0})
+            {product.rating?.toFixed(1)} (
+            {product.reviewCount ?? product.reviews?.length ?? 0})
           </span>
         </div>
 

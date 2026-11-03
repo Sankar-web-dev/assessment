@@ -2,19 +2,20 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts, fetchCategories } from '../../store/productsSlice'
-import { addProduct, updateProduct } from '../../store/adminSlice'
+import { createProductApi, updateProductApi } from '../../api/adminApi'
 import { selectAllProducts, selectAllCategories } from '../../store/selectors'
 
 const EMPTY = {
-  title: '',
-  category: '',
+  name: '',
+  categoryId: '',
   price: '',
-  discountPercentage: '',
+  comparePrice: '',
   stock: '',
   rating: '',
   brand: '',
-  thumbnail: '',
+  image: '',
   description: '',
+  isFeatured: false,
 }
 
 export default function AdminProductForm() {
@@ -29,6 +30,8 @@ export default function AdminProductForm() {
 
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [saving, setSaving] = useState(false)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
@@ -39,18 +42,19 @@ export default function AdminProductForm() {
   // Prefill when editing
   useEffect(() => {
     if (!isEdit) return
-    const existing = products.find((p) => p.id === Number(id))
+    const existing = products.find((p) => String(p.id) === String(id))
     if (existing) {
       setForm({
-        title: existing.title ?? '',
-        category: existing.category ?? '',
-        price: existing.price ?? '',
-        discountPercentage: existing.discountPercentage ?? '',
+        name: existing.title ?? '',
+        categoryId: existing.categoryId ?? '',
+        price: existing.sellingPrice ?? existing.price ?? '',
+        comparePrice: existing.comparePrice || '',
         stock: existing.stock ?? '',
         rating: existing.rating ?? '',
         brand: existing.brand ?? '',
-        thumbnail: existing.thumbnail ?? '',
+        image: existing.images?.[0] ?? '',
         description: existing.description ?? '',
+        isFeatured: !!existing.isFeatured,
       })
     } else if (listStatus === 'succeeded') {
       setNotFound(true)
@@ -58,57 +62,54 @@ export default function AdminProductForm() {
   }, [isEdit, id, products, listStatus])
 
   const set = (key) => (e) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+    setForm((f) => ({
+      ...f,
+      [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+    }))
 
   const validate = () => {
     const errs = {}
-    if (!form.title.trim()) errs.title = 'Title is required'
-    if (!form.category) errs.category = 'Category is required'
+    if (!form.name.trim()) errs.name = 'Name is required'
+    if (!form.categoryId) errs.categoryId = 'Category is required'
     if (form.price === '' || Number(form.price) <= 0)
       errs.price = 'Price must be greater than 0'
+    if (form.comparePrice !== '' && Number(form.comparePrice) < Number(form.price))
+      errs.comparePrice = 'Must be greater than or equal to price'
     if (form.stock === '' || Number(form.stock) < 0)
       errs.stock = 'Stock must be 0 or more'
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     if (!validate()) return
-    const existing = isEdit
-      ? products.find((p) => p.id === Number(id))
-      : undefined
-    const thumb =
-      form.thumbnail.trim() ||
-      existing?.thumbnail ||
-      'https://cdn.dummyjson.com/product-images/placeholder.webp'
+    setSaving(true)
+    setSubmitError('')
     const payload = {
-      // Keep API fields we don't expose in the form (reviews, dimensions…).
-      ...existing,
-      title: form.title.trim(),
-      category: form.category,
-      price: Number(form.price),
-      discountPercentage: Number(form.discountPercentage) || 0,
+      name: form.name.trim(),
+      description: form.description.trim() || 'No description provided.',
+      category: form.categoryId, // backend expects the category ObjectId
+      price: Number(form.price), // selling price
+      comparePrice: Number(form.comparePrice) || 0, // original price → discount
       stock: Number(form.stock),
       rating: form.rating === '' ? 0 : Number(form.rating),
       brand: form.brand.trim() || undefined,
-      thumbnail: thumb,
-      images: existing?.images?.length ? existing.images : [thumb],
-      description: form.description.trim() || 'No description provided.',
-      reviews: existing?.reviews ?? [],
-      availabilityStatus:
-        Number(form.stock) === 0
-          ? 'Out of Stock'
-          : Number(form.stock) < 10
-            ? 'Low Stock'
-            : 'In Stock',
+      images: form.image.trim() ? [form.image.trim()] : [],
+      isFeatured: form.isFeatured,
     }
-    if (isEdit) {
-      dispatch(updateProduct({ ...payload, id: Number(id) }))
-    } else {
-      dispatch(addProduct(payload))
+    try {
+      if (isEdit) {
+        await dispatch(updateProductApi(id, payload))
+      } else {
+        await dispatch(createProductApi(payload))
+      }
+      navigate('/admin/products')
+    } catch (err) {
+      setSubmitError(err.message)
+    } finally {
+      setSaving(false)
     }
-    navigate('/admin/products')
   }
 
   if (notFound) {
@@ -135,17 +136,17 @@ export default function AdminProductForm() {
 
       <form className="admin__form" onSubmit={submit} noValidate>
         <div className="admin__field">
-          <label className="caption" htmlFor="f-title">
-            Title
+          <label className="caption" htmlFor="f-name">
+            Name
           </label>
           <input
-            id="f-title"
-            className={`input${errors.title ? ' input--error' : ''}`}
-            value={form.title}
-            onChange={set('title')}
+            id="f-name"
+            className={`input${errors.name ? ' input--error' : ''}`}
+            value={form.name}
+            onChange={set('name')}
             placeholder="Product name"
           />
-          {errors.title && <p className="field-error">{errors.title}</p>}
+          {errors.name && <p className="field-error">{errors.name}</p>}
         </div>
 
         <div className="admin__field">
@@ -154,18 +155,20 @@ export default function AdminProductForm() {
           </label>
           <select
             id="f-category"
-            className={`input${errors.category ? ' input--error' : ''}`}
-            value={form.category}
-            onChange={set('category')}
+            className={`input${errors.categoryId ? ' input--error' : ''}`}
+            value={form.categoryId}
+            onChange={set('categoryId')}
           >
             <option value="">Select category</option>
             {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>
+              <option key={c._id} value={c._id}>
                 {c.name}
               </option>
             ))}
           </select>
-          {errors.category && <p className="field-error">{errors.category}</p>}
+          {errors.categoryId && (
+            <p className="field-error">{errors.categoryId}</p>
+          )}
         </div>
 
         <div className="admin__grid-2">
@@ -186,20 +189,22 @@ export default function AdminProductForm() {
             {errors.price && <p className="field-error">{errors.price}</p>}
           </div>
           <div className="admin__field">
-            <label className="caption" htmlFor="f-discount">
-              Discount %
+            <label className="caption" htmlFor="f-compare">
+              Compare price (original)
             </label>
             <input
-              id="f-discount"
+              id="f-compare"
               type="number"
               min="0"
-              max="100"
               step="0.01"
-              className="input"
-              value={form.discountPercentage}
-              onChange={set('discountPercentage')}
-              placeholder="0"
+              className={`input${errors.comparePrice ? ' input--error' : ''}`}
+              value={form.comparePrice}
+              onChange={set('comparePrice')}
+              placeholder="Optional — creates the discount"
             />
+            {errors.comparePrice && (
+              <p className="field-error">{errors.comparePrice}</p>
+            )}
           </div>
         </div>
 
@@ -246,19 +251,19 @@ export default function AdminProductForm() {
             className="input"
             value={form.brand}
             onChange={set('brand')}
-            placeholder="Brand name"
+            placeholder="Kadai Basics"
           />
         </div>
 
         <div className="admin__field">
-          <label className="caption" htmlFor="f-thumb">
+          <label className="caption" htmlFor="f-image">
             Image URL
           </label>
           <input
-            id="f-thumb"
+            id="f-image"
             className="input"
-            value={form.thumbnail}
-            onChange={set('thumbnail')}
+            value={form.image}
+            onChange={set('image')}
             placeholder="https://…"
           />
         </div>
@@ -277,9 +282,21 @@ export default function AdminProductForm() {
           />
         </div>
 
+        <label className="admin__switch" htmlFor="f-featured">
+          <input
+            id="f-featured"
+            type="checkbox"
+            checked={form.isFeatured}
+            onChange={set('isFeatured')}
+          />
+          <span>Featured product</span>
+        </label>
+
+        {submitError && <p className="field-error">{submitError}</p>}
+
         <div className="admin__form-actions">
-          <button type="submit" className="btn btn--primary">
-            {isEdit ? 'Save changes' : 'Add product'}
+          <button type="submit" className="btn btn--primary" disabled={saving}>
+            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add product'}
           </button>
           <Link to="/admin/products" className="btn btn--ghost">
             Cancel

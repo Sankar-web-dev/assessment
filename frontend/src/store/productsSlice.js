@@ -1,19 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-
-const API = 'https://dummyjson.com'
-
-async function getJson(url) {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Request failed (${res.status})`)
-  return res.json()
-}
+import { api } from '../api/client'
+import { normalizeProduct } from '../utils/normalize'
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await getJson(`${API}/products?limit=0`)
-      return data.products
+      // GET /api/v1/products -> { products, pagination }
+      const data = await api('/products?limit=50')
+      return data.products.map(normalizeProduct)
     } catch (err) {
       return rejectWithValue(err.message)
     }
@@ -24,7 +19,8 @@ export const fetchCategories = createAsyncThunk(
   'products/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
-      return await getJson(`${API}/products/categories`)
+      // GET /api/v1/categories -> [{ _id, name, slug }]
+      return await api('/categories')
     } catch (err) {
       return rejectWithValue(err.message)
     }
@@ -35,7 +31,20 @@ export const fetchProductById = createAsyncThunk(
   'products/fetchProductById',
   async (id, { rejectWithValue }) => {
     try {
-      return await getJson(`${API}/products/${id}`)
+      // GET /api/v1/products/:id -> product
+      return normalizeProduct(await api(`/products/${id}`))
+    } catch (err) {
+      return rejectWithValue(err.message)
+    }
+  },
+)
+
+// Admin-only: requires an auth token (401 without login).
+export const fetchCoupons = createAsyncThunk(
+  'products/fetchCoupons',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      return await api('/coupons', { token: getState().auth.token })
     } catch (err) {
       return rejectWithValue(err.message)
     }
@@ -48,6 +57,8 @@ const initialState = {
   error: null,
   categories: [],
   categoriesStatus: 'idle',
+  coupons: [],
+  couponsStatus: 'idle',
   detail: { data: null, status: 'idle', error: null },
   search: '',
 }
@@ -88,6 +99,17 @@ const productsSlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state) => {
         state.categoriesStatus = 'failed'
+      })
+      // Coupons (admin)
+      .addCase(fetchCoupons.pending, (state) => {
+        state.couponsStatus = 'loading'
+      })
+      .addCase(fetchCoupons.fulfilled, (state, action) => {
+        state.couponsStatus = 'succeeded'
+        state.coupons = action.payload
+      })
+      .addCase(fetchCoupons.rejected, (state) => {
+        state.couponsStatus = 'failed'
       })
       // Product detail
       .addCase(fetchProductById.pending, (state) => {

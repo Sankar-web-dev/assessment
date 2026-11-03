@@ -4,35 +4,11 @@ import { discountedPrice, round2 } from '../utils/money'
 export const FREE_SHIPPING_THRESHOLD = 50
 export const SHIPPING_FEE = 4.99
 
-/* ============ Admin-merged catalog selectors ============ */
+/* ============ Catalog selectors (backed by the API) ============ */
 
-// API products + admin custom products − admin deletions, with overrides applied.
-export const selectAllProducts = createSelector(
-  [
-    (state) => state.products.items,
-    (state) => state.admin.customProducts,
-    (state) => state.admin.productOverrides,
-    (state) => state.admin.deletedIds,
-  ],
-  (apiItems, custom, overrides, deletedIds) =>
-    apiItems
-      .filter((p) => !deletedIds.includes(p.id))
-      .map((p) => overrides[p.id] ?? p)
-      .concat(custom),
-)
-
-// API categories + admin-created categories (deduped by slug).
-export const selectAllCategories = createSelector(
-  [(state) => state.products.categories, (state) => state.admin.customCategories],
-  (apiCats, customCats) => {
-    const map = new Map()
-    apiCats.forEach((c) => map.set(c.slug, { ...c, source: 'api' }))
-    customCats.forEach((c) => map.set(c.slug, { ...c, source: 'custom' }))
-    return [...map.values()]
-  },
-)
-
-export const selectCoupons = (state) => state.admin.coupons
+export const selectAllProducts = (state) => state.products.items
+export const selectAllCategories = (state) => state.products.categories
+export const selectCoupons = (state) => state.products.coupons
 
 /* ============ Cart selectors ============ */
 
@@ -60,6 +36,7 @@ export const selectCouponDiscount = createSelector(
 )
 
 // Shipping is FREE when the subtotal is $50 or more, otherwise $4.99.
+// (matches the backend pricing rules in doodlebackend/utils/pricing.js)
 export const selectShipping = createSelector([selectSubtotal], (subtotal) =>
   subtotal <= 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE,
 )

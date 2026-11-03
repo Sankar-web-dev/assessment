@@ -1,24 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { fetchCoupons } from '../../store/productsSlice'
 import {
-  addCoupon,
-  updateCoupon,
-  deleteCoupon,
-} from '../../store/adminSlice'
+  createCouponApi,
+  updateCouponApi,
+  deleteCouponApi,
+} from '../../api/adminApi'
 import { selectCoupons } from '../../store/selectors'
 import { removeCoupon } from '../../store/cartSlice'
+import { money } from '../../utils/money'
 import Icon from '../../components/Icon'
 
 export default function AdminCoupons() {
   const dispatch = useDispatch()
   const coupons = useSelector(selectCoupons)
+  const couponsStatus = useSelector((s) => s.products.couponsStatus)
   const activeCoupon = useSelector((s) => s.cart.coupon)
 
   const [code, setCode] = useState('')
   const [percent, setPercent] = useState('')
+  const [minOrder, setMinOrder] = useState('')
   const [error, setError] = useState('')
 
-  const submit = (e) => {
+  useEffect(() => {
+    if (couponsStatus === 'idle') dispatch(fetchCoupons())
+  }, [dispatch, couponsStatus])
+
+  const submit = async (e) => {
     e.preventDefault()
     const cleanCode = code.trim().toUpperCase()
     const pct = Number(percent)
@@ -30,20 +38,41 @@ export default function AdminCoupons() {
       setError('Discount must be between 1 and 100')
       return
     }
-    if (coupons.some((c) => c.code === cleanCode)) {
-      setError('Coupon code already exists')
-      return
-    }
-    dispatch(addCoupon({ code: cleanCode, percent: pct, active: true }))
-    setCode('')
-    setPercent('')
     setError('')
+    try {
+      await dispatch(
+        createCouponApi({
+          code: cleanCode,
+          discountPercent: pct,
+          minOrderAmount: Number(minOrder) || 0,
+        }),
+      )
+      setCode('')
+      setPercent('')
+      setMinOrder('')
+    } catch (err) {
+      setError(err.message) // e.g. "Coupon code already exists"
+    }
   }
 
-  const remove = (c) => {
-    dispatch(deleteCoupon(c.code))
-    // If this coupon is currently applied to the cart, drop it there too.
-    if (activeCoupon?.code === c.code) dispatch(removeCoupon())
+  const toggle = async (c, active) => {
+    setError('')
+    try {
+      await dispatch(updateCouponApi(c._id, { isActive: active }))
+      if (!active && activeCoupon?.code === c.code) dispatch(removeCoupon())
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const remove = async (c) => {
+    setError('')
+    try {
+      await dispatch(deleteCouponApi(c._id))
+      if (activeCoupon?.code === c.code) dispatch(removeCoupon())
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   return (
@@ -74,6 +103,15 @@ export default function AdminCoupons() {
           placeholder="% off"
           value={percent}
           onChange={(e) => setPercent(e.target.value)}
+          style={{ maxWidth: 110 }}
+        />
+        <input
+          className="input"
+          type="number"
+          min="0"
+          placeholder="Min order $"
+          value={minOrder}
+          onChange={(e) => setMinOrder(e.target.value)}
           style={{ maxWidth: 120 }}
         />
         <button type="submit" className="btn btn--primary">
@@ -89,39 +127,32 @@ export default function AdminCoupons() {
             <tr>
               <th>Code</th>
               <th>Discount</th>
+              <th>Min order</th>
               <th>Status</th>
               <th className="admin__col-actions">Actions</th>
             </tr>
           </thead>
           <tbody>
             {coupons.map((c) => (
-              <tr key={c.code} className={c.active ? '' : 'admin__row--deleted'}>
+              <tr key={c._id} className={c.isActive ? '' : 'admin__row--deleted'}>
                 <td>
                   <span className="chip chip--active">{c.code}</span>
                 </td>
-                <td>{c.percent}% off</td>
+                <td>{c.discountPercent}% off</td>
+                <td>{c.minOrderAmount ? money(c.minOrderAmount) : '—'}</td>
                 <td>
                   <label className="admin__switch">
                     <input
                       type="checkbox"
-                      checked={c.active}
-                      onChange={(e) => {
-                        dispatch(
-                          updateCoupon({
-                            code: c.code,
-                            active: e.target.checked,
-                          }),
-                        )
-                        if (!e.target.checked && activeCoupon?.code === c.code)
-                          dispatch(removeCoupon())
-                      }}
+                      checked={c.isActive}
+                      onChange={(e) => toggle(c, e.target.checked)}
                     />
                     <span
                       className={
-                        c.active ? 'admin__status--on' : 'admin__status--off'
+                        c.isActive ? 'admin__status--on' : 'admin__status--off'
                       }
                     >
-                      {c.active ? 'Active' : 'Disabled'}
+                      {c.isActive ? 'Active' : 'Disabled'}
                     </span>
                   </label>
                 </td>
@@ -136,10 +167,17 @@ export default function AdminCoupons() {
                 </td>
               </tr>
             ))}
-            {coupons.length === 0 && (
+            {coupons.length === 0 && couponsStatus === 'succeeded' && (
               <tr>
-                <td colSpan={4} className="muted" style={{ textAlign: 'center' }}>
+                <td colSpan={5} className="muted" style={{ textAlign: 'center' }}>
                   No coupons yet — add one above.
+                </td>
+              </tr>
+            )}
+            {couponsStatus === 'failed' && (
+              <tr>
+                <td colSpan={5} className="muted" style={{ textAlign: 'center' }}>
+                  Could not load coupons — try signing in again.
                 </td>
               </tr>
             )}

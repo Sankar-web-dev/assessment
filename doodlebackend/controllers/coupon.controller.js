@@ -23,6 +23,24 @@ class CouponController {
         }
     }
 
+    async updateCoupon(req, res) {
+        try {
+            const coupon = await couponService.updateCoupon(req.params.id, req.body);
+            res.status(200).json(coupon);
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ message: error.message });
+        }
+    }
+
+    async deleteCoupon(req, res) {
+        try {
+            const result = await couponService.deleteCoupon(req.params.id);
+            res.status(200).json(result);
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ message: error.message });
+        }
+    }
+
     async getCoupons(req, res) {
         try {
             const coupons = await couponService.getCoupons();

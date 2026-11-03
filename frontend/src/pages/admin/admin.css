@@ -2,6 +2,36 @@
 .admin__head {
   margin-bottom: var(--space-6);
 }
+.admin__head--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.admin__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-body-sm);
+}
+
+.admin__login {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-inline: auto;
+}
+.admin__switch-mode {
+  border: 0;
+  background: transparent;
+  font: var(--text-label);
+  color: var(--color-primary-600);
+  align-self: center;
+}
+.admin__switch-mode:hover {
+  text-decoration: underline;
+}
 
 .admin__tabs {
   display: flex;
