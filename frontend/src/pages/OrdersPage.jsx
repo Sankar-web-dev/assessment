@@ -4,13 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchMyOrders, cancelOrder } from '../store/ordersSlice'
 import { money } from '../utils/money'
 import Icon from '../components/Icon'
+import './admin/admin.css'
 
 const STATUS_CHIP = {
-  pending: '',
-  processing: 'chip--active',
-  shipped: 'chip--active',
-  delivered: 'chip--active',
-  cancelled: 'admin__row--deleted',
+  pending: 'admin__status--off',
+  processing: 'admin__status--on',
+  shipped: 'admin__status--on',
+  delivered: 'admin__status--on',
+  cancelled: 'admin__status--off',
 }
 
 export default function OrdersPage() {

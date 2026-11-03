@@ -16,10 +16,9 @@ export default function AdminOrders() {
 
   const changeStatus = async (id, status) => {
     setError('')
-    try {
-      await dispatch(updateOrderStatus({ id, status }))
-    } catch (err) {
-      setError(err.message || 'Could not update status')
+    const res = await dispatch(updateOrderStatus({ id, status }))
+    if (updateOrderStatus.rejected.match(res)) {
+      setError(res.payload || 'Could not update status')
     }
   }
 
