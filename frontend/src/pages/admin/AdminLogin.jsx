@@ -16,8 +16,9 @@ export default function AdminLogin() {
     e.preventDefault()
     setDenied('')
     dispatch(clearAuthError())
-    const res = await dispatch(login({ email, password }))
-    if (login.fulfilled.match(res) && res.payload.user?.role !== 'admin') {
+    // login() returns the session { user, token } or null on failure
+    const session = await dispatch(login({ email, password }))
+    if (session && session.user?.role !== 'admin') {
       // Regular user trying to enter the admin area
       dispatch(logout())
       setDenied('This account does not have admin access.')

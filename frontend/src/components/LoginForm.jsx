@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, signup, clearAuthError } from '../store/authSlice'
 
-// Customer sign in / create account — shared by the /login page.
 export default function LoginForm() {
   const dispatch = useDispatch()
   const { status, error } = useSelector((s) => s.auth)
 
-  const [mode, setMode] = useState('login') // login | signup
+  const [mode, setMode] = useState('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

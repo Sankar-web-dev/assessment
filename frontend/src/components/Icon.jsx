@@ -1,4 +1,4 @@
-// 20px icons, 2px stroke (design tokens)
+
 const PATHS = {
   search: (
     <>

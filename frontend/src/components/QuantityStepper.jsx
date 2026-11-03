@@ -5,7 +5,7 @@ export default function QuantityStepper({
   onDecrease,
   onIncrease,
   max,
-  variant, // 'cart' renders "N in cart" label
+  variant,
   small = false,
 }) {
   return (

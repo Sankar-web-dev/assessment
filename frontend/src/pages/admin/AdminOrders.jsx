@@ -16,10 +16,9 @@ export default function AdminOrders() {
 
   const changeStatus = async (id, status) => {
     setError('')
-    const res = await dispatch(updateOrderStatus({ id, status }))
-    if (updateOrderStatus.rejected.match(res)) {
-      setError(res.payload || 'Could not update status')
-    }
+    // thunk returns an error message on failure, null on success
+    const err = await dispatch(updateOrderStatus({ id, status }))
+    if (err) setError(err)
   }
 
   return (

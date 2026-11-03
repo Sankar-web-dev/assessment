@@ -39,6 +39,7 @@ export default function CartPage() {
   const couponError = useSelector(selectCouponError)
   const token = useSelector((s) => s.auth.token)
   const checkoutStatus = useSelector((s) => s.orders.checkoutStatus)
+  const checkoutError = useSelector((s) => s.orders.checkoutError)
 
   const navigate = useNavigate()
   const showToast = useToast()
@@ -49,14 +50,13 @@ export default function CartPage() {
       navigate('/login', { state: { from: '/cart' } })
       return
     }
-    const res = await dispatch(checkoutOrder())
-    if (checkoutOrder.fulfilled.match(res)) {
+    // checkoutOrder() returns the new order, or null if it failed
+    const order = await dispatch(checkoutOrder())
+    if (order) {
       dispatch(clearCart())
       dispatch(resetCheckout())
       showToast('Order placed successfully', '/orders', 'View orders')
       navigate('/orders')
-    } else {
-      showToast(res.payload || 'Order could not be placed')
     }
   }
 
@@ -244,6 +244,9 @@ export default function CartPage() {
                   ? 'Proceed to checkout'
                   : 'Sign in to checkout'}
             </button>
+            {checkoutError && (
+              <p className="field-error">{checkoutError}</p>
+            )}
             <p className="summary__note muted">
               Prices in USD. The cart is saved after refresh (redux-persist).
             </p>

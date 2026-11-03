@@ -21,6 +21,7 @@ export default function OrdersPage() {
   const token = useSelector((s) => s.auth.token)
   const { myOrders, myStatus, myError } = useSelector((s) => s.orders)
   const [filter, setFilter] = useState('all')
+  const [cancelError, setCancelError] = useState('')
 
   // Refetch on every visit so admin-side status changes are reflected
   useEffect(() => {
@@ -42,6 +43,8 @@ export default function OrdersPage() {
             Continue shopping
           </Link>
         </div>
+
+        {cancelError && <p className="field-error">{cancelError}</p>}
 
         {myStatus !== 'idle' && (
           <nav className="admin__tabs" style={{ marginBottom: 'var(--space-4)' }}>
@@ -162,7 +165,12 @@ export default function OrdersPage() {
                 <button
                   type="button"
                   className="btn btn--danger btn--sm"
-                  onClick={() => dispatch(cancelOrder(o._id))}
+                  onClick={async () => {
+                    setCancelError('')
+                    // thunk returns an error message on failure
+                    const err = await dispatch(cancelOrder(o._id))
+                    if (err) setCancelError(err)
+                  }}
                 >
                   Cancel order
                 </button>
