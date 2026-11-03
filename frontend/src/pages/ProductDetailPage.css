@@ -327,6 +327,11 @@
   font: var(--text-body-sm);
 }
 
+.reviews-section {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ============ Key features ============ */
 .features {
   position: relative;

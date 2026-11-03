@@ -15,6 +15,14 @@ import QuantityStepper from '../components/QuantityStepper'
 import ProductCard from '../components/ProductCard'
 import SkeletonCard from '../components/SkeletonCard'
 import Icon from '../components/Icon'
+import ReviewList from '../components/ReviewList'
+import ReviewForm from '../components/ReviewForm'
+import {
+  getProductReviews,
+  createReview,
+  updateReview,
+  deleteReview,
+} from '../api/reviewApi'
 import './ProductDetailPage.css'
 
 const TABS = ['Description', 'Specifications', 'Reviews']
@@ -34,6 +42,14 @@ export default function ProductDetailPage() {
   const [imgIndex, setImgIndex] = useState(0)
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('Description')
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [editingReview, setEditingReview] = useState(null)
+  const [userReview, setUserReview] = useState(null)
+
+  const user = useSelector((s) => s.auth.user)
+  const token = useSelector((s) => s.auth.token)
 
   // Prefer the already-loaded catalog; fall back to the detail fetch.
   const catalogProduct = allProducts.find((p) => String(p.id) === String(id))
@@ -53,6 +69,79 @@ export default function ProductDetailPage() {
     return () => dispatch(clearDetail())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, id])
+
+  // Load reviews when product changes
+  useEffect(() => {
+    if (product) {
+      loadReviews()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product])
+
+  const loadReviews = async () => {
+    if (!product) return
+    setReviewsLoading(true)
+    try {
+      const productId = product.id || product._id
+      const data = await getProductReviews(productId)
+      setReviews(data.reviews || [])
+      // Check if current user has already reviewed
+      if (user) {
+        const myReview = data.reviews?.find((r) => r.user._id === user.id || r.user._id === user._id)
+        setUserReview(myReview || null)
+      }
+    } catch (error) {
+      console.error('Failed to load reviews:', error)
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  const handleCreateReview = async (reviewData) => {
+    try {
+      const productId = product.id || product._id
+      await createReview({ ...reviewData, productId }, token)
+      showToast('Review submitted successfully!')
+      setShowReviewForm(false)
+      loadReviews()
+    } catch (error) {
+      showToast(error.message || 'Failed to submit review')
+    }
+  }
+
+  const handleUpdateReview = async (reviewData) => {
+    try {
+      const productId = product.id || product._id
+      await updateReview(editingReview._id, { ...reviewData, productId }, token)
+      showToast('Review updated successfully!')
+      setEditingReview(null)
+      setShowReviewForm(false)
+      loadReviews()
+    } catch (error) {
+      showToast(error.message || 'Failed to update review')
+    }
+  }
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return
+    try {
+      await deleteReview(reviewId, token)
+      showToast('Review deleted successfully!')
+      loadReviews()
+    } catch (error) {
+      showToast(error.message || 'Failed to delete review')
+    }
+  }
+
+  const handleEditReview = (review) => {
+    setEditingReview(review)
+    setShowReviewForm(true)
+  }
+
+  const handleCancelReview = () => {
+    setShowReviewForm(false)
+    setEditingReview(null)
+  }
 
   const relatedItems = useMemo(
     () =>
@@ -314,23 +403,35 @@ export default function ProductDetailPage() {
                 )}
 
                 {tab === 'Reviews' && (
-                  <ul className="reviews">
-                    {(product.reviews ?? []).map((r, i) => (
-                      <li key={i} className="reviews__item">
-                        <div className="reviews__head">
-                          <RatingStars rating={r.rating} />
-                          <strong>{r.reviewerName}</strong>
-                          <span className="muted">
-                            {new Date(r.date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="tabs__text">{r.comment}</p>
-                      </li>
-                    ))}
-                    {(product.reviews ?? []).length === 0 && (
-                      <p className="muted">No reviews yet.</p>
+                  <div className="reviews-section">
+                    {user && !userReview && !showReviewForm && (
+                      <button
+                        type="button"
+                        className="btn btn--primary"
+                        onClick={() => setShowReviewForm(true)}
+                        style={{ marginBottom: '1.5rem' }}
+                      >
+                        Write a Review
+                      </button>
                     )}
-                  </ul>
+
+                    {showReviewForm && (
+                      <ReviewForm
+                        productId={product.id || product._id}
+                        initialReview={editingReview}
+                        onSubmit={editingReview ? handleUpdateReview : handleCreateReview}
+                        onCancel={handleCancelReview}
+                      />
+                    )}
+
+                    <ReviewList
+                      reviews={reviews}
+                      currentUserId={user?.id}
+                      onEdit={handleEditReview}
+                      onDelete={handleDeleteReview}
+                      loading={reviewsLoading}
+                    />
+                  </div>
                 )}
               </div>
               </section>
