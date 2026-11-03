@@ -8,7 +8,7 @@ import {
 } from '../store/productsSlice'
 import { selectAllProducts } from '../store/selectors'
 import { addToCart } from '../store/cartSlice'
-import { discountedPrice, money, round2 } from '../utils/money'
+import { discountedPrice, money } from '../utils/money'
 import { useToast } from '../components/Toast'
 import RatingStars from '../components/RatingStars'
 import QuantityStepper from '../components/QuantityStepper'
@@ -18,6 +18,8 @@ import Icon from '../components/Icon'
 import './ProductDetailPage.css'
 
 const TABS = ['Description', 'Specifications', 'Reviews']
+
+const fmtCount = (n) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n))
 
 export default function ProductDetailPage() {
   const { id } = useParams()
@@ -93,7 +95,6 @@ export default function ProductDetailPage() {
   const images = product?.images?.length ? product.images : [product?.thumbnail]
   const discounted = product ? discountedPrice(product) : 0
   const discountPct = product ? Math.round(product.discountPercentage || 0) : 0
-  const savings = product ? round2(product.price - discounted) : 0
   const stock = product?.stock ?? 0
   const stockLabel =
     stock === 0 ? 'Out of stock' : stock < 10 ? `Only ${stock} left` : `In stock · ${stock}`
@@ -128,27 +129,18 @@ export default function ProductDetailPage() {
         ) : (
           <>
             <nav className="breadcrumb" aria-label="Breadcrumb">
-              <Link to="/">Home</Link>
-              <span>/</span>
-              <Link to="/">{product.category}</Link>
-              <span>/</span>
+              <Link to="/" className="breadcrumb__home" aria-label="Home">
+                <Icon name="home" size={16} />
+              </Link>
+              <Icon name="chevronRight" size={12} />
+              <Link to="/">{product.categoryName || product.category}</Link>
+              <Icon name="chevronRight" size={12} />
               <span className="breadcrumb__current">{product.title}</span>
             </nav>
 
             <section className="pdetail">
-              {/* Gallery */}
+              {/* Gallery — vertical thumbs like the reference layout */}
               <div className="pdetail__gallery">
-                <div className="pdetail__main">
-                  {discountPct > 0 && (
-                    <span className="badge badge--sale pdetail__badge">
-                      -{discountPct}%
-                    </span>
-                  )}
-                  <img src={images[imgIndex]} alt={product.title} />
-                  <span className="pdetail__img-count caption">
-                    Image {imgIndex + 1} of {images.length} (product images)
-                  </span>
-                </div>
                 <div className="pdetail__thumbs">
                   {images.slice(0, 4).map((src, i) => (
                     <button
@@ -162,13 +154,26 @@ export default function ProductDetailPage() {
                     </button>
                   ))}
                 </div>
+                <div className="pdetail__main">
+                  {discountPct > 0 && (
+                    <span className="badge badge--sale pdetail__badge">
+                      -{discountPct}%
+                    </span>
+                  )}
+                  <img src={images[imgIndex]} alt={product.title} />
+                  <span className="pdetail__img-count caption">
+                    {imgIndex + 1} / {images.length}
+                  </span>
+                </div>
               </div>
 
               {/* Info */}
               <div className="pdetail__info">
                 <div className="pdetail__meta">
-                  <span className="caption" style={{ color: 'var(--color-primary-600)' }}>
-                    {product.category}
+                  <span className="pdetail__chip">
+                    {product.rating >= 4.5
+                      ? 'Best Seller'
+                      : product.categoryName || product.category}
                   </span>
                   <span className={`pdetail__stock ${stockClass}`}>
                     {stockLabel}
@@ -180,11 +185,14 @@ export default function ProductDetailPage() {
                 <div className="pdetail__rating">
                   <RatingStars rating={product.rating} />
                   <span>
-                    {product.rating?.toFixed(1)} ·{' '}
-                    {product.reviewCount ?? product.reviews?.length ?? 0} reviews
+                    {product.rating?.toFixed(1)} (
+                    {fmtCount(
+                      product.reviewCount ?? product.reviews?.length ?? 0,
+                    )}{' '}
+                    reviews)
                   </span>
                   {product.brand && (
-                    <span className="muted">· Brand: {product.brand}</span>
+                    <span className="muted">· {product.brand}</span>
                   )}
                 </div>
 
@@ -193,9 +201,7 @@ export default function ProductDetailPage() {
                   {discountPct > 0 && (
                     <>
                       <s className="pdetail__price-old">{money(product.price)}</s>
-                      <span className="pdetail__save">
-                        You save {money(savings)} ({discountPct}%)
-                      </span>
+                      <span className="pdetail__off">{discountPct}% OFF</span>
                     </>
                   )}
                 </div>
@@ -219,7 +225,8 @@ export default function ProductDetailPage() {
                       onClick={add}
                       disabled={stock === 0}
                     >
-                      Add to cart
+                      <Icon name="cart" size={18} />
+                      Add to Cart
                     </button>
                     <button
                       type="button"
@@ -227,7 +234,8 @@ export default function ProductDetailPage() {
                       onClick={buyNow}
                       disabled={stock === 0}
                     >
-                      Buy now
+                      <Icon name="zap" size={18} filled />
+                      Buy Now
                     </button>
                   </div>
                 </div>
@@ -236,25 +244,23 @@ export default function ProductDetailPage() {
                   <div className="pdetail__perk">
                     <Icon name="truck" size={20} />
                     <div>
-                      <strong>Free shipping</strong>
-                      <span className="muted">On orders of $50 or more</span>
-                    </div>
-                  </div>
-                  <div className="pdetail__perk">
-                    <Icon name="rotateCcw" size={20} />
-                    <div>
-                      <strong>7-day returns</strong>
-                      <span className="muted">
-                        {product.returnPolicy || 'Easy returns'}
-                      </span>
+                      <strong>Free Shipping</strong>
+                      <span className="muted">on orders over $50</span>
                     </div>
                   </div>
                   <div className="pdetail__perk">
                     <Icon name="shield" size={20} />
                     <div>
-                      <strong>Warranty</strong>
+                      <strong>Secure Payment</strong>
+                      <span className="muted">100% protected</span>
+                    </div>
+                  </div>
+                  <div className="pdetail__perk">
+                    <Icon name="rotateCcw" size={20} />
+                    <div>
+                      <strong>Easy Returns</strong>
                       <span className="muted">
-                        {product.warrantyInformation || '1-year warranty'}
+                        {product.returnPolicy || '30-day policy'}
                       </span>
                     </div>
                   </div>
@@ -262,24 +268,25 @@ export default function ProductDetailPage() {
               </div>
             </section>
 
-            {/* Tabs */}
-            <section className="tabs">
-              <div className="tabs__bar" role="tablist">
-                {TABS.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === t}
-                    className={`tabs__tab${tab === t ? ' is-active' : ''}`}
-                    onClick={() => setTab(t)}
-                  >
-                    {t === 'Reviews'
-                      ? `Reviews (${product.reviewCount ?? product.reviews?.length ?? 0})`
-                      : t}
-                  </button>
-                ))}
-              </div>
+            {/* Tabs + key features */}
+            <div className="pdetail__lower">
+              <section className="tabs">
+                <div className="tabs__bar" role="tablist">
+                  {TABS.map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      role="tab"
+                      aria-selected={tab === t}
+                      className={`tabs__tab${tab === t ? ' is-active' : ''}`}
+                      onClick={() => setTab(t)}
+                    >
+                      {t === 'Reviews'
+                        ? `Reviews (${fmtCount(product.reviewCount ?? product.reviews?.length ?? 0)})`
+                        : t}
+                    </button>
+                  ))}
+                </div>
 
               <div className="tabs__panel">
                 {tab === 'Description' && (
@@ -326,7 +333,29 @@ export default function ProductDetailPage() {
                   </ul>
                 )}
               </div>
-            </section>
+              </section>
+
+              <aside className="features">
+                <h3 className="features__title">Key Features</h3>
+                <ul className="features__list">
+                  {[
+                    product.brand && `Genuine ${product.brand}`,
+                    product.warrantyInformation || '1-year warranty',
+                    product.availabilityStatus || 'Ready to ship',
+                    product.returnPolicy || '30-day easy returns',
+                  ]
+                    .filter(Boolean)
+                    .slice(0, 4)
+                    .map((f) => (
+                      <li key={f}>
+                        <Icon name="checkCircle" size={18} />
+                        {f}
+                      </li>
+                    ))}
+                </ul>
+                <Icon name="gamepad" size={120} style={{ strokeWidth: 1 }} />
+              </aside>
+            </div>
 
             {/* Related */}
             <section className="related">

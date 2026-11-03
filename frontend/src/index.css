@@ -21,6 +21,31 @@ body {
   color: var(--color-gray-700);
   background: var(--color-gray-50);
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+::selection {
+  background: var(--color-primary-600);
+  color: var(--color-white);
+}
+
+/* Themed scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: var(--radius-pill);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 h1,
@@ -110,15 +135,16 @@ button {
 }
 
 .btn--primary {
-  background: var(--color-primary-600);
+  background: var(--grad-brand);
   color: var(--color-white);
 }
 .btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-700);
+  box-shadow: var(--glow-primary);
+  filter: brightness(1.12);
 }
 
 .btn--secondary {
-  background: var(--color-white);
+  background: var(--surface);
   border-color: var(--color-primary-600);
   color: var(--color-primary-600);
 }
@@ -166,7 +192,7 @@ button {
   border-radius: var(--radius-md);
   font: var(--text-body-sm);
   color: var(--color-gray-900);
-  background: var(--color-white);
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
   transition:
     border-color var(--transition),
@@ -192,7 +218,7 @@ button {
 
 select.input {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B94AD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-3) center;
   padding-right: var(--space-10);
@@ -213,7 +239,7 @@ select.input {
   padding-inline: var(--space-3);
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-gray-200);
-  background: var(--color-white);
+  background: var(--surface);
   font: var(--text-caption);
   text-transform: none;
   letter-spacing: normal;
@@ -248,10 +274,10 @@ select.input {
 }
 
 .badge--sale {
-  background: var(--color-accent-600);
+  background: var(--grad-sale);
 }
 .badge--new {
-  background: var(--color-primary-600);
+  background: var(--grad-brand);
 }
 
 /* ============ Quantity stepper ============ */
@@ -261,7 +287,7 @@ select.input {
   height: var(--control-md);
   border: 1px solid var(--color-gray-300);
   border-radius: var(--radius-md);
-  background: var(--color-white);
+  background: var(--surface);
   overflow: hidden;
 }
 
@@ -322,7 +348,7 @@ select.input {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.7),
+    var(--shimmer),
     transparent
   );
   animation: shimmer 1.4s infinite;
@@ -345,14 +371,15 @@ select.input {
   min-height: var(--control-lg);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
-  background: var(--color-gray-900);
-  color: var(--color-white);
+  background: var(--chrome);
+  border: 1px solid var(--border-chrome);
+  color: var(--on-chrome);
   box-shadow: var(--shadow-lg);
   font: var(--text-label);
   animation: toast-in var(--transition);
 }
 .toast a {
-  color: var(--color-primary-100);
+  color: var(--color-primary-700);
   text-decoration: underline;
   font: var(--text-label);
 }
@@ -392,7 +419,7 @@ select.input {
   padding: var(--space-12) var(--space-6);
   border: 1px solid var(--color-gray-200);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface);
   text-align: center;
 }
 

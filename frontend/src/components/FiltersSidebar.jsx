@@ -4,9 +4,16 @@ import RatingStars from './RatingStars'
 import './FiltersSidebar.css'
 
 export const RATING_OPTIONS = [
-  { value: 4, label: '4 stars & up' },
-  { value: 3, label: '3 stars & up' },
+  { value: 4, label: '4 stars & above' },
+  { value: 3, label: '3 stars & above' },
   { value: 0, label: 'Any rating' },
+]
+
+const PRICE_RANGES = [
+  { label: 'All prices', min: '', max: '' },
+  { label: '$0 – $50', min: '0', max: '50' },
+  { label: '$50 – $100', min: '50', max: '100' },
+  { label: '$100+', min: '100', max: '' },
 ]
 
 export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
@@ -47,28 +54,26 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
       </section>
 
       <section className="filters__group">
-        <h3 className="caption filters__label">Price</h3>
-        <div className="filters__price">
-          <input
-            type="number"
-            className="input"
-            placeholder="Min"
-            min="0"
-            value={draft.minPrice}
-            onChange={(e) => onChange({ ...draft, minPrice: e.target.value })}
-            aria-label="Minimum price"
-          />
-          <span className="muted">to</span>
-          <input
-            type="number"
-            className="input"
-            placeholder="Max"
-            min="0"
-            value={draft.maxPrice}
-            onChange={(e) => onChange({ ...draft, maxPrice: e.target.value })}
-            aria-label="Maximum price"
-          />
-        </div>
+        <h3 className="caption filters__label">Price Range</h3>
+        <ul className="filters__list">
+          {PRICE_RANGES.map((r) => (
+            <li key={r.label}>
+              <label className="filters__option">
+                <input
+                  type="radio"
+                  name="price-range"
+                  checked={
+                    draft.minPrice === r.min && draft.maxPrice === r.max
+                  }
+                  onChange={() =>
+                    onChange({ ...draft, minPrice: r.min, maxPrice: r.max })
+                  }
+                />
+                <span>{r.label}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="filters__group">

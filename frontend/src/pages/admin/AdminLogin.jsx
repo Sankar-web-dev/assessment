@@ -26,7 +26,7 @@ export default function AdminLogin() {
       <h2 className="admin__panel-title">Admin sign in</h2>
       <p className="muted">
         Sign in to manage products, categories and coupons. Data is stored in
-        the Kadai API.
+        the VoltNex API.
       </p>
 
       <form className="admin__form" onSubmit={submit}>
@@ -56,7 +56,7 @@ export default function AdminLogin() {
             className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@kadai.store"
+            placeholder="admin@voltnex.gg"
             required
           />
         </div>

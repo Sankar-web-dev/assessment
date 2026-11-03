@@ -44,6 +44,12 @@ export default function CartPage() {
   const showToast = useToast()
   const [code, setCode] = useState('')
 
+  // Total product-level savings (original − selling price).
+  const savings = items.reduce(
+    (sum, i) => sum + Math.max(0, i.price - discountedPrice(i)) * i.qty,
+    0,
+  )
+
   const checkout = async () => {
     if (!token) {
       navigate('/login', { state: { from: '/cart' } })
@@ -64,15 +70,17 @@ export default function CartPage() {
     return (
       <div className="page">
         <div className="container">
-          <h1 className="page-title">Shopping cart</h1>
           <div className="state-box cart-empty">
-            <Icon name="cart" size={40} />
-            <h2 className="cart-empty__title">Your cart is empty</h2>
+            <span className="cart-empty__icon">
+              <Icon name="cart" size={48} />
+            </span>
+            <h2 className="cart-empty__title">Your Cart is Empty!</h2>
             <p className="muted">
-              Browse our products and add something you like.
+              Looks like you haven't added anything yet.
             </p>
-            <Link to="/" className="btn btn--primary">
-              Browse products
+            <Link to="/" className="btn btn--primary btn--lg">
+              Shop Now
+              <Icon name="arrowRight" size={16} />
             </Link>
           </div>
         </div>
@@ -85,11 +93,11 @@ export default function CartPage() {
       <div className="container">
         <div className="cart__head">
           <h1 className="page-title">
-            Shopping cart <span className="muted">({count} items)</span>
+            Your Cart <span className="muted">({count} items)</span>
           </h1>
           <Link to="/" className="cart__continue">
-            <Icon name="arrowRight" size={16} style={{ transform: 'scaleX(-1)' }} />
-            Continue shopping
+            Continue Shopping
+            <Icon name="arrowRight" size={16} />
           </Link>
         </div>
 
@@ -151,16 +159,9 @@ export default function CartPage() {
                 )
               })}
             </ul>
-          </section>
 
-          {/* Order summary */}
-          <aside className="summary">
-            <h2 className="summary__title">Order summary</h2>
-
-            <div className="summary__coupon">
-              <label htmlFor="coupon" className="caption">
-                Coupon code
-              </label>
+            {/* Coupon under the items, like the reference layout */}
+            <div className="cart__coupon">
               {coupon ? (
                 <div className="summary__coupon-applied">
                   <span className="chip summary__coupon-chip">
@@ -181,7 +182,7 @@ export default function CartPage() {
                   <input
                     id="coupon"
                     className={`input${couponError ? ' input--error' : ''}`}
-                    placeholder="Enter code"
+                    placeholder="Enter Coupon Code"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     onKeyDown={(e) => {
@@ -193,7 +194,7 @@ export default function CartPage() {
                   />
                   <button
                     type="button"
-                    className="btn btn--secondary"
+                    className="btn btn--primary"
                     onClick={() => dispatch(applyCoupon(code))}
                   >
                     Apply
@@ -202,6 +203,11 @@ export default function CartPage() {
               )}
               {couponError && <p className="field-error">{couponError}</p>}
             </div>
+          </section>
+
+          {/* Order summary */}
+          <aside className="summary">
+            <h2 className="summary__title">Order Summary</h2>
 
             <dl className="summary__rows">
               <div className="summary__row">
@@ -220,6 +226,12 @@ export default function CartPage() {
                   {shipping === 0 ? 'FREE' : money(shipping)}
                 </dd>
               </div>
+              {savings > 0 && (
+                <div className="summary__row summary__row--discount">
+                  <dt>You Save</dt>
+                  <dd>{money(savings)}</dd>
+                </div>
+              )}
               {shipping > 0 && (
                 <p className="summary__hint">
                   Add {money(FREE_SHIPPING_THRESHOLD - subtotal)} more for free
@@ -241,7 +253,7 @@ export default function CartPage() {
               {checkoutStatus === 'placing'
                 ? 'Placing order…'
                 : token
-                  ? 'Proceed to checkout'
+                  ? 'Proceed to Checkout'
                   : 'Sign in to checkout'}
             </button>
             <p className="summary__note muted">

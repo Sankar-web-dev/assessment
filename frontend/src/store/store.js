@@ -24,7 +24,7 @@ const storage = {
 }
 
 const cartPersistConfig = {
-  key: 'kadai-cart',
+  key: 'voltnex-cart',
   storage,
   whitelist: ['items', 'coupon'],
 }
