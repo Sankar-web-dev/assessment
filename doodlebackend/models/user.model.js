@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:true
     },
+    // Default shipping address — prefilled into orders at checkout.
+    address: {
+        line1: { type: String, trim: true },
+        city: { type: String, trim: true },
+        state: { type: String, trim: true },
+        postalCode: { type: String, trim: true },
+        country: { type: String, trim: true, default: "USA" },
+    },
     role: {
         type: String,
         enum: ["user", "admin"],

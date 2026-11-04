@@ -5,12 +5,12 @@ const userService = require("../services/user.service");
 class UserController{
     async signup(req, res) {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, address } = req.body;
             if(!name || !email || !password)
             {
                 return res.status(400).json({message : "All fields are required"});
             }
-            const user = await userService.signup(name, email, password);
+            const user = await userService.signup(name, email, password, address);
             res.status(201).json(user);
         } catch (error) {
             res.status(500).json({ message: error.message });

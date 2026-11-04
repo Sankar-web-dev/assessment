@@ -139,6 +139,20 @@ export default function OrdersPage() {
               ))}
             </ul>
 
+            {o.shippingAddress?.line1 && (
+              <p className="muted caption" style={{ marginTop: 'var(--space-3)' }}>
+                Ship to:{' '}
+                {[
+                  o.shippingAddress.line1,
+                  o.shippingAddress.city,
+                  o.shippingAddress.state,
+                  o.shippingAddress.postalCode,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+            )}
+
             <dl className="summary__rows" style={{ maxWidth: 320, marginLeft: 'auto' }}>
               <div className="summary__row">
                 <dt>Subtotal</dt>

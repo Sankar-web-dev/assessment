@@ -10,6 +10,12 @@ export default function LoginForm({ header }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [address, setAddress] = useState({
+    line1: '',
+    city: '',
+    state: '',
+    postalCode: '',
+  })
 
   const submit = (e) => {
     e.preventDefault()
@@ -17,7 +23,7 @@ export default function LoginForm({ header }) {
     if (mode === 'login') {
       dispatch(login({ email, password }))
     } else {
-      dispatch(signup({ name, email, password }))
+      dispatch(signup({ name, email, password, address }))
     }
   }
 
@@ -82,6 +88,70 @@ export default function LoginForm({ header }) {
             required
           />
         </div>
+
+        {mode === 'signup' && (
+          <>
+            <div className="admin__field">
+              <label className="caption" htmlFor="u-line1">
+                Address
+              </label>
+              <input
+                id="u-line1"
+                className="input"
+                value={address.line1}
+                onChange={(e) =>
+                  setAddress({ ...address, line1: e.target.value })
+                }
+                placeholder="Street address"
+                autoComplete="street-address"
+              />
+            </div>
+            <div className="admin__grid-2">
+              <div className="admin__field">
+                <label className="caption" htmlFor="u-city">
+                  City
+                </label>
+                <input
+                  id="u-city"
+                  className="input"
+                  value={address.city}
+                  onChange={(e) =>
+                    setAddress({ ...address, city: e.target.value })
+                  }
+                  autoComplete="address-level2"
+                />
+              </div>
+              <div className="admin__field">
+                <label className="caption" htmlFor="u-zip">
+                  ZIP code
+                </label>
+                <input
+                  id="u-zip"
+                  className="input"
+                  value={address.postalCode}
+                  onChange={(e) =>
+                    setAddress({ ...address, postalCode: e.target.value })
+                  }
+                  autoComplete="postal-code"
+                />
+              </div>
+            </div>
+            <div className="admin__field">
+              <label className="caption" htmlFor="u-state">
+                State
+              </label>
+              <input
+                id="u-state"
+                className="input"
+                value={address.state}
+                onChange={(e) =>
+                  setAddress({ ...address, state: e.target.value })
+                }
+                autoComplete="address-level1"
+              />
+            </div>
+          </>
+        )}
 
         {error && <p className="field-error">{error}</p>}
 

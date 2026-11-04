@@ -4,7 +4,7 @@ const tokenService = require("../jwt/token.service");
 
 class UserService
 {
-    async signup(name,email,password)
+    async signup(name,email,password,address)
     {
         const existingUser = await User.findOne({email});
         if(existingUser)
@@ -12,7 +12,7 @@ class UserService
             throw new Error("User already exists");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({name,email,password:hashedPassword});
+        const user = await User.create({name,email,password:hashedPassword,address});
         const userWithoutPassword = user.toObject();
         delete userWithoutPassword.password;
         return userWithoutPassword;

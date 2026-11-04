@@ -91,7 +91,12 @@ export const checkoutOrder = () => async (dispatch, getState) => {
   try {
     const order = await api('/orders', {
       method: 'POST',
-      body: { items, couponCode: state.cart.coupon?.code || undefined },
+      body: {
+        items,
+        couponCode: state.cart.coupon?.code || undefined,
+        // Saved on the user at signup — prefills the order's shippingAddress.
+        shippingAddress: state.auth.user?.address || undefined,
+      },
       token: state.auth.token,
     })
     dispatch(checkoutPlaced())
