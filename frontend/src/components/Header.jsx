@@ -63,77 +63,80 @@ export default function Header() {
           </form>
         )}
 
-        {/* Compact cart shortcut — visible in the bar on mobile only */}
-        {token && !isAdmin && (
-          <NavLink to="/cart" className="header__cart header__cart--bar">
-            <Icon name="cart" size={20} />
-            <span>Cart</span>
-            {count > 0 && <span className="header__cart-count">{count}</span>}
-          </NavLink>
-        )}
-
-        <button
-          type="button"
-          className="header__menu-btn"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          aria-controls="header-nav"
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <Icon name={menuOpen ? 'x' : 'menu'} size={22} />
-        </button>
-
-        <nav
-          className={`header__nav${menuOpen ? ' is-open' : ''}`}
-          id="header-nav"
-          aria-label="Account"
-        >
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={`header__link${isActive(item.to) ? ' active' : ''}`}
-              onClick={closeMenu}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="header__actions">
+          {/* Compact cart shortcut — visible in the bar on mobile only */}
           {token && !isAdmin && (
-            <NavLink to="/cart" className="header__cart" onClick={closeMenu}>
+            <NavLink to="/cart" className="header__cart header__cart--bar">
               <Icon name="cart" size={20} />
               <span>Cart</span>
               {count > 0 && <span className="header__cart-count">{count}</span>}
             </NavLink>
           )}
-          <ThemeToggle />
-          {token ? (
-            <div className="header__account">
-              <span className="header__avatar" aria-hidden="true">
-                {(user?.name || user?.email || '?').charAt(0).toUpperCase()}
-              </span>
-              <span className="header__user">{user?.name || user?.email}</span>
-              <button
-                type="button"
-                className="header__logout"
-                onClick={() => {
-                  dispatch(logout())
-                  navigate('/landing')
-                  closeMenu()
-                }}
+
+          <nav
+            className={`header__nav${menuOpen ? ' is-open' : ''}`}
+            id="header-nav"
+            aria-label="Account"
+          >
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                className={`header__link${isActive(item.to) ? ' active' : ''}`}
+                onClick={closeMenu}
               >
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <NavLink
-              to="/login"
-              className="header__link header__login"
-              onClick={closeMenu}
-            >
-              Login
-            </NavLink>
-          )}
-        </nav>
+                {item.label}
+              </Link>
+            ))}
+            {token && !isAdmin && (
+              <NavLink to="/cart" className="header__cart" onClick={closeMenu}>
+                <Icon name="cart" size={20} />
+                <span>Cart</span>
+                {count > 0 && <span className="header__cart-count">{count}</span>}
+              </NavLink>
+            )}
+            {token ? (
+              <div className="header__account">
+                <span className="header__avatar" aria-hidden="true">
+                  {(user?.name || user?.email || '?').charAt(0).toUpperCase()}
+                </span>
+                <span className="header__user">{user?.name || user?.email}</span>
+                <button
+                  type="button"
+                  className="header__logout"
+                  onClick={() => {
+                    dispatch(logout())
+                    navigate('/landing')
+                    closeMenu()
+                  }}
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                className="header__link header__login"
+                onClick={closeMenu}
+              >
+                Login
+              </NavLink>
+            )}
+          </nav>
+
+          <ThemeToggle />
+
+          <button
+            type="button"
+            className="header__menu-btn"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="header-nav"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <Icon name={menuOpen ? 'x' : 'menu'} size={22} />
+          </button>
+        </div>
       </div>
     </header>
   )
