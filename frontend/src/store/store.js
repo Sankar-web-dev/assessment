@@ -17,10 +17,15 @@ const store = configureStore({
   },
 })
 
-// Sync the auth session to localStorage on every change (login/logout).
+// Sync the auth session to localStorage on every change.
+// On logout (no token) the saved entry is removed entirely.
 store.subscribe(() => {
   const { token, user } = store.getState().auth
-  localStorage.setItem('voltnex-auth', JSON.stringify({ token, user }))
+  if (token) {
+    localStorage.setItem('voltnex-auth', JSON.stringify({ token, user }))
+  } else {
+    localStorage.removeItem('voltnex-auth')
+  }
 })
 
 export default store
