@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './store/store'
 import { ToastProvider } from './components/Toast'
+import { ThemeProvider } from './theme/ThemeProvider'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import LandingPage from './pages/LandingPage'
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+          <ThemeProvider>
           <ToastProvider>
             <div className="app">
               <Header />
@@ -96,6 +98,7 @@ export default function App() {
               <Footer />
             </div>
           </ToastProvider>
+          </ThemeProvider>
       </BrowserRouter>
     </Provider>
   )
