@@ -45,7 +45,7 @@ export default function ProductListPage() {
   const [sort, setSort] = useState('featured')
   const [page, setPage] = useState(1)
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const debouncedSearch = useDebounce(search, 300)
+  const debouncedSearch = useDebounce(search, 1000)
 
   useEffect(() => {
     if (status === 'idle') dispatch(fetchProducts())
