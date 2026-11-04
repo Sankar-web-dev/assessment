@@ -8,12 +8,6 @@ import Icon from './Icon'
 import ThemeToggle from './ThemeToggle'
 import './Header.css'
 
-const NAV = [
-  { to: '/', label: 'Home', match: '' },
-  { to: '/products', label: 'Products', match: 'path' },
-  { to: '/#about', label: 'About', match: 'hash:#about' },
-]
-
 export default function Header() {
   const count = useSelector(selectCartItemCount)
   const search = useSelector((s) => s.products.search)
@@ -25,23 +19,22 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
 
-  const isActive = (match) => {
-    if (match === 'path') return location.pathname === '/products'
-    if (match?.startsWith('hash:'))
-      return (
-        location.pathname === '/' && location.hash === match.slice(5)
-      )
-    return (
-      location.pathname === '/' &&
-      location.search === '' &&
-      location.hash === ''
-    )
-  }
+  // Storefront nav — shown only for signed-in shoppers (admins use the
+  // admin area's own tabs).
+  const navItems =
+    token && !isAdmin
+      ? [
+          { to: '/products', label: 'Products' },
+          { to: '/orders', label: 'Orders' },
+        ]
+      : []
+
+  const isActive = (to) => location.pathname.startsWith(to)
 
   return (
     <header className="header">
       <div className="container header__inner">
-        <Link to="/" className="header__logo" aria-label="VoltNex home">
+        <Link to="/landing" className="header__logo" aria-label="VoltNex home">
           <span className="header__logo-mark">
             <Icon name="zap" size={16} filled />
           </span>
@@ -50,19 +43,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="header__nav header__nav--main" aria-label="Categories">
-          {NAV.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={`header__link${isActive(item.match) ? ' active' : ''}`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        {!isAdmin && (
+        {token && !isAdmin && (
           <form
             className="header__search"
             role="search"
@@ -83,7 +64,7 @@ export default function Header() {
         )}
 
         {/* Compact cart shortcut — visible in the bar on mobile only */}
-        {!isAdmin && (
+        {token && !isAdmin && (
           <NavLink to="/cart" className="header__cart header__cart--bar">
             <Icon name="cart" size={20} />
             <span>Cart</span>
@@ -107,27 +88,17 @@ export default function Header() {
           id="header-nav"
           aria-label="Account"
         >
-          {/* Category links — only rendered inside the mobile dropdown */}
-          {!isAdmin &&
-            NAV.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                className={`header__link header__link--mobile${isActive(item.match) ? ' active' : ''}`}
-                onClick={closeMenu}
-              >
-                {item.label}
-              </Link>
-            ))}
-          {!isAdmin && token && (
-            <NavLink to="/orders" className="header__link" onClick={closeMenu}>
-              Orders
-            </NavLink>
-          )}
-          <NavLink to="/admin" className="header__link" onClick={closeMenu}>
-            Admin
-          </NavLink>
-          {!isAdmin && (
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`header__link${isActive(item.to) ? ' active' : ''}`}
+              onClick={closeMenu}
+            >
+              {item.label}
+            </Link>
+          ))}
+          {token && !isAdmin && (
             <NavLink to="/cart" className="header__cart" onClick={closeMenu}>
               <Icon name="cart" size={20} />
               <span>Cart</span>
@@ -146,7 +117,7 @@ export default function Header() {
                 className="header__logout"
                 onClick={() => {
                   dispatch(logout())
-                  navigate('/')
+                  navigate('/landing')
                   closeMenu()
                 }}
               >
@@ -154,22 +125,13 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <>
-              <NavLink
-                to="/login"
-                className="header__link header__login"
-                onClick={closeMenu}
-              >
-                Login
-              </NavLink>
-              <NavLink
-                to="/login"
-                className="header__link header__signin"
-                onClick={closeMenu}
-              >
-                Sign Up
-              </NavLink>
-            </>
+            <NavLink
+              to="/login"
+              className="header__link header__login"
+              onClick={closeMenu}
+            >
+              Login
+            </NavLink>
           )}
         </nav>
       </div>

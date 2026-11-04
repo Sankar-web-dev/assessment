@@ -16,14 +16,14 @@ const PRICE_RANGES = [
   { label: '$100+', min: '100', max: '' },
 ]
 
-export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
+export default function FiltersSidebar({ filters, onChange, onClear }) {
   const categories = useSelector(selectAllCategories)
 
   const toggleCategory = (slug) => {
-    const next = draft.categories.includes(slug)
-      ? draft.categories.filter((c) => c !== slug)
-      : [...draft.categories, slug]
-    onChange({ ...draft, categories: next })
+    const next = filters.categories.includes(slug)
+      ? filters.categories.filter((c) => c !== slug)
+      : [...filters.categories, slug]
+    onChange({ ...filters, categories: next })
   }
 
   return (
@@ -43,8 +43,8 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
               <input
                 type="radio"
                 name="category-all"
-                checked={draft.categories.length === 0}
-                onChange={() => onChange({ ...draft, categories: [] })}
+                checked={filters.categories.length === 0}
+                onChange={() => onChange({ ...filters, categories: [] })}
               />
               <span>All products</span>
             </label>
@@ -54,7 +54,7 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
               <label className="filters__option">
                 <input
                   type="checkbox"
-                  checked={draft.categories.includes(c.slug)}
+                  checked={filters.categories.includes(c.slug)}
                   onChange={() => toggleCategory(c.slug)}
                 />
                 <span>{c.name}</span>
@@ -74,10 +74,10 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
                   type="radio"
                   name="price-range"
                   checked={
-                    draft.minPrice === r.min && draft.maxPrice === r.max
+                    filters.minPrice === r.min && filters.maxPrice === r.max
                   }
                   onChange={() =>
-                    onChange({ ...draft, minPrice: r.min, maxPrice: r.max })
+                    onChange({ ...filters, minPrice: r.min, maxPrice: r.max })
                   }
                 />
                 <span>{r.label}</span>
@@ -96,8 +96,8 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
                 <input
                   type="radio"
                   name="min-rating"
-                  checked={draft.minRating === r.value}
-                  onChange={() => onChange({ ...draft, minRating: r.value })}
+                  checked={filters.minRating === r.value}
+                  onChange={() => onChange({ ...filters, minRating: r.value })}
                 />
                 <span className="filters__rating">
                   {r.value > 0 && <RatingStars rating={r.value} />}
@@ -109,13 +109,6 @@ export default function FiltersSidebar({ draft, onChange, onApply, onClear }) {
         </ul>
       </section>
 
-      <button
-        type="button"
-        className="btn btn--primary btn--block"
-        onClick={onApply}
-      >
-        Apply filters
-      </button>
     </aside>
   )
 }

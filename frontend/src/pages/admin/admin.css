@@ -2,6 +2,9 @@
 .admin__head {
   margin-bottom: var(--space-6);
 }
+.admin__head--center {
+  text-align: center;
+}
 .admin__head--row {
   display: flex;
   align-items: center;
@@ -31,6 +34,34 @@
 }
 .admin__switch-mode:hover {
   text-decoration: underline;
+}
+
+/* Segmented switch used inside the sign-in card (Customer / Admin) */
+.admin__seg {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-gray-100);
+  border-radius: var(--radius-md);
+}
+.admin__seg-btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font: var(--text-label);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+}
+.admin__seg-btn.is-active {
+  background: var(--surface);
+  color: var(--color-primary-600);
+  box-shadow: var(--shadow-sm);
 }
 
 .admin__tabs {

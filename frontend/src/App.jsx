@@ -1,7 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
-import store, { persistor } from './store/store'
+import store from './store/store'
 import { ToastProvider } from './components/Toast'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -17,25 +16,61 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminCoupons from './pages/admin/AdminCoupons'
-import { Navigate } from 'react-router-dom'
+import RequireAuth from './components/RequireAuth'
+import RequireAdmin from './components/RequireAdmin'
 
 export default function App() {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
+      <BrowserRouter>
           <ToastProvider>
             <div className="app">
               <Header />
               <main className="app__main">
                 <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/products" element={<ProductListPage />} />
-                  <Route path="/product/:id" element={<ProductDetailPage />} />
-                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/" element={<Navigate to="/landing" replace />} />
+                  <Route path="/landing" element={<LandingPage />} />
                   <Route path="/login" element={<LoginPage />} />
-                  <Route path="/orders" element={<OrdersPage />} />
-                  <Route path="/admin" element={<AdminLayout />}>
+                  <Route
+                    path="/products"
+                    element={
+                      <RequireAuth>
+                        <ProductListPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/product/:id"
+                    element={
+                      <RequireAuth>
+                        <ProductDetailPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/cart"
+                    element={
+                      <RequireAuth>
+                        <CartPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/orders"
+                    element={
+                      <RequireAuth>
+                        <OrdersPage />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <RequireAdmin>
+                        <AdminLayout />
+                      </RequireAdmin>
+                    }
+                  >
                     <Route index element={<Navigate to="/admin/products" replace />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="products/new" element={<AdminProductForm />} />
@@ -44,14 +79,13 @@ export default function App() {
                     <Route path="coupons" element={<AdminCoupons />} />
                     <Route path="orders" element={<AdminOrders />} />
                   </Route>
-                  <Route path="*" element={<LandingPage />} />
+                  <Route path="*" element={<Navigate to="/landing" replace />} />
                 </Routes>
               </main>
               <Footer />
             </div>
           </ToastProvider>
-        </BrowserRouter>
-      </PersistGate>
+      </BrowserRouter>
     </Provider>
   )
 }

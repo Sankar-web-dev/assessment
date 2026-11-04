@@ -86,10 +86,6 @@
   gap: var(--space-5);
   margin-left: auto;
 }
-.header__nav--main {
-  margin-left: 0;
-  gap: var(--space-4);
-}
 .header__link {
   position: relative;
   padding-block: var(--space-1);
@@ -245,12 +241,6 @@
   box-shadow: var(--glow-cyan);
 }
 
-@media (max-width: 1024px) {
-  .header__nav--main {
-    display: none;
-  }
-}
-
 .header__cart--bar,
 .header__menu-btn {
   display: none;
@@ -268,11 +258,6 @@
 }
 .header__menu-btn:hover {
   background: var(--chrome-field);
-}
-
-/* Category links duplicated in the dropdown for mobile — hidden on desktop */
-.header__link--mobile {
-  display: none;
 }
 
 /* ============ Tablet & mobile ============ */
@@ -326,9 +311,6 @@
   }
   .header__nav .header__link {
     padding: var(--space-3) var(--page-padding);
-  }
-  .header__nav .header__link--mobile {
-    display: block;
   }
   /* cart lives in the bar — don't duplicate it inside the menu */
   .header__nav .header__cart {

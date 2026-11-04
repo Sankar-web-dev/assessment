@@ -17,7 +17,7 @@ export default function Footer() {
         </div>
 
         <nav className="footer__links" aria-label="Footer">
-          <Link to="/#about" className="footer__link">
+          <Link to="/landing#about" className="footer__link">
             About Us
           </Link>
           <a href="mailto:support@voltnex.gg" className="footer__link">

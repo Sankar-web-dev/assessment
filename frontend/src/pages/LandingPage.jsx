@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchProducts } from '../store/productsSlice'
 import { selectAllProducts } from '../store/selectors'
 import ProductCard from '../components/ProductCard'
 import Icon from '../components/Icon'
@@ -29,9 +30,15 @@ const SHOP_CATS = [
 ]
 
 export default function LandingPage() {
+  const dispatch = useDispatch()
   const items = useSelector(selectAllProducts)
+  const status = useSelector((s) => s.products.status)
   const token = useSelector((s) => s.auth.token)
   const location = useLocation()
+
+  useEffect(() => {
+    if (status === 'idle') dispatch(fetchProducts())
+  }, [dispatch, status])
 
   useEffect(() => {
     if (location.hash) {
@@ -209,68 +216,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ============ Auth ============ */}
-      <section className="container landing__section">
-        <div className="landing__auth">
-          <h3 className="landing__auth-title">
-            {token ? 'Welcome back!' : 'Get started with VoltNex'}
-          </h3>
-          <div className="landing__auth-btns">
-            {token ? (
-              <Link to="/products" className="btn btn--primary btn--lg">
-                <Icon name="cart" size={18} />
-                Continue Shopping
-              </Link>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn--primary btn--lg">
-                  <Icon name="user" size={18} />
-                  Login
-                </Link>
-                <Link to="/login" className="btn btn--secondary btn--lg">
-                  <Icon name="user" size={18} />
-                  Sign Up
-                </Link>
-                <Link to="/login" className="btn btn--ghost btn--lg">
-                  Create Account
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ CTA banner ============ */}
-      <section className="container landing__section">
-        <div className="landing__cta">
-          <div>
-            <h2>Ready to Start Shopping?</h2>
-            <p>
-              Create an account or log in to explore the latest electronics,
-              exclusive deals and more.
-            </p>
-          </div>
-          <div className="landing__cta-btns">
-            {token ? (
-              <Link to="/products" className="btn btn--primary btn--lg">
-                <Icon name="cart" size={18} />
-                Continue Shopping
-              </Link>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn--secondary btn--lg">
-                  <Icon name="user" size={18} />
-                  Login
-                </Link>
-                <Link to="/login" className="btn btn--primary btn--lg">
-                  <Icon name="user" size={18} />
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
