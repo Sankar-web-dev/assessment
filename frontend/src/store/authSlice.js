@@ -1,9 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { api } from '../api/client'
 
+// Restore the session saved by the store subscribe() in store.js.
+const saved = JSON.parse(localStorage.getItem('voltnex-auth') || '{}')
+
 const initialState = {
-  token: null,
-  user: null,
+  token: saved.token || null,
+  user: saved.user || null,
   status: 'idle', // idle | loading | succeeded | failed
   error: null,
 }

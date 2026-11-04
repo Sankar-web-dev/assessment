@@ -27,7 +27,7 @@ class UserService
         }
         if(!user.isActive)
         {   
-            throw new Error("User is not active");
+            throw new Error("Your account is inactive. Please contact support.");
         }
         const isPasswordValid =
             user.password && (await bcrypt.compare(password, user.password));
@@ -46,6 +46,21 @@ class UserService
     async getAllUsers()
     {
         return User.find().sort({ createdAt: -1 });
+    }
+
+    // Admin-only: activate/deactivate a user account.
+    async setUserStatus(id, isActive)
+    {
+        const user = await User.findByIdAndUpdate(
+            id,
+            { $set: { isActive: Boolean(isActive) } },
+            { new: true }
+        );
+        if(!user)
+        {
+            throw new Error("User not found");
+        }
+        return user;
     }
 
     async logout()

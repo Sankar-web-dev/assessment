@@ -37,6 +37,14 @@ class UserController{
             res.status(500).json({ message: error.message });
         }
     }
+    async updateUserStatus(req, res) {
+        try {
+            const user = await userService.setUserStatus(req.params.id, req.body.isActive);
+            res.status(200).json(user);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
     async logout(req, res) {
         try {
             const result = await userService.logout();

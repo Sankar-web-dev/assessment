@@ -7,6 +7,7 @@ export default function AdminCustomers() {
   const token = useSelector((s) => s.auth.token)
   const [users, setUsers] = useState([])
   const [status, setStatus] = useState('loading') // loading | succeeded | failed
+  const [error, setError] = useState('')
 
   useEffect(() => {
     api('/users', { token })
@@ -17,6 +18,23 @@ export default function AdminCustomers() {
       .catch(() => setStatus('failed'))
   }, [token])
 
+  // PATCH /users/:id/status — flips isActive; deactivated users can't sign in.
+  const toggle = async (u, isActive) => {
+    setError('')
+    try {
+      await api(`/users/${u._id}/status`, {
+        method: 'PATCH',
+        body: { isActive },
+        token,
+      })
+      setUsers((list) =>
+        list.map((x) => (x._id === u._id ? { ...x, isActive } : x)),
+      )
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <div className="admin__panel">
       <div className="admin__panel-head">
@@ -25,6 +43,8 @@ export default function AdminCustomers() {
           <p className="muted">{users.length} registered customers</p>
         </div>
       </div>
+
+      {error && <p className="field-error">{error}</p>}
 
       <div className="admin__table-wrap">
         <table className="admin__table">
@@ -50,13 +70,20 @@ export default function AdminCustomers() {
                   </span>
                 </td>
                 <td>
-                  <span
-                    className={
-                      u.isActive ? 'admin__status--on' : 'admin__status--off'
-                    }
-                  >
-                    {u.isActive ? 'Active' : 'Disabled'}
-                  </span>
+                  <label className="admin__switch">
+                    <input
+                      type="checkbox"
+                      checked={u.isActive}
+                      onChange={(e) => toggle(u, e.target.checked)}
+                    />
+                    <span
+                      className={
+                        u.isActive ? 'admin__status--on' : 'admin__status--off'
+                      }
+                    >
+                      {u.isActive ? 'Active' : 'Disabled'}
+                    </span>
+                  </label>
                 </td>
                 <td>
                   {u.createdAt

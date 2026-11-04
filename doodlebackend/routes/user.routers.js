@@ -8,5 +8,6 @@ router.post('/signup', userController.signup);
 router.post('/login', userController.login);
 router.post('/logout', authMiddleware, userController.logout);
 router.get('/users', authMiddleware, requireAdmin, userController.getUsers);
+router.patch('/users/:id/status', authMiddleware, requireAdmin, userController.updateUserStatus);
 
 module.exports = router;
