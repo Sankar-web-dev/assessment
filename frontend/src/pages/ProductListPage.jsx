@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { fetchProducts, fetchCategories, setSearch } from '../store/productsSlice'
 import { selectAllProducts, selectAllCategories } from '../store/selectors'
+import useDebounce from '../hooks/useDebounce'
 import { discountedPrice } from '../utils/money'
 import ProductCard from '../components/ProductCard'
 import SkeletonCard from '../components/SkeletonCard'
@@ -39,61 +40,45 @@ export default function ProductListPage() {
   const categories = useSelector(selectAllCategories)
   const { status, error, search } = useSelector((s) => s.products)
   const [searchParams] = useSearchParams()
-  const location = useLocation()
 
-  const [draft, setDraft] = useState(EMPTY_FILTERS)
-  const [applied, setApplied] = useState(EMPTY_FILTERS)
+  const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [sort, setSort] = useState('featured')
   const [page, setPage] = useState(1)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const debouncedSearch = useDebounce(search, 300)
 
   useEffect(() => {
     if (status === 'idle') dispatch(fetchProducts())
     if (categories.length === 0) dispatch(fetchCategories())
   }, [dispatch, status, categories.length])
 
-  // Header nav drives filters through the URL (?q=, ?cat=, ?sort=).
-  /* eslint-disable react-hooks/set-state-in-effect */
+  // Landing/category links drive filters through the URL (?q=, ?cat=, ?sort=).
   useEffect(() => {
     const q = searchParams.get('q')
     const cat = searchParams.get('cat')
-    const sortParam = searchParams.get('sort')
     if (q !== null) dispatch(setSearch(q))
-    if (cat) {
-      setApplied((a) => ({ ...a, categories: [cat] }))
-      setDraft((d) => ({ ...d, categories: [cat] }))
-    }
-    if (sortParam === 'deals') setSort('deals')
+    if (cat) setFilters((f) => ({ ...f, categories: [cat] }))
+    if (searchParams.get('sort') === 'deals') setSort('deals')
     setPage(1)
     if (searchParams.get('view') === 'products') {
       document
         .getElementById('products')
         ?.scrollIntoView({ behavior: 'smooth' })
     }
-    if (location.hash === '#about') {
-      setTimeout(
-        () =>
-          document
-            .getElementById('about')
-            ?.scrollIntoView({ behavior: 'smooth' }),
-        50,
-      )
-    }
-  }, [searchParams, location.hash, dispatch])
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [searchParams, dispatch])
 
   const filtered = useMemo(() => {
-    const min = parseFloat(applied.minPrice)
-    const max = parseFloat(applied.maxPrice)
-    const q = search.trim().toLowerCase()
+    const min = parseFloat(filters.minPrice)
+    const max = parseFloat(filters.maxPrice)
+    const q = debouncedSearch.trim().toLowerCase()
 
     let list = items.filter((p) => {
       const price = discountedPrice(p)
-      if (applied.categories.length && !applied.categories.includes(p.category))
+      if (filters.categories.length && !filters.categories.includes(p.category))
         return false
       if (!Number.isNaN(min) && price < min) return false
       if (!Number.isNaN(max) && price > max) return false
-      if (applied.minRating > 0 && p.rating < applied.minRating) return false
+      if (filters.minRating > 0 && p.rating < filters.minRating) return false
       if (
         q &&
         !`${p.title} ${p.brand ?? ''} ${p.category}`.toLowerCase().includes(q)
@@ -121,7 +106,7 @@ export default function ProductListPage() {
         break
     }
     return list
-  }, [items, applied, sort, search])
+  }, [items, filters, sort, debouncedSearch])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(page, pageCount)
@@ -130,15 +115,13 @@ export default function ProductListPage() {
     safePage * PAGE_SIZE,
   )
 
-  const applyFilters = () => {
-    setApplied(draft)
+  const handleFilterChange = (next) => {
+    setFilters(next)
     setPage(1)
-    setFiltersOpen(false)
   }
 
   const clearFilters = () => {
-    setDraft(EMPTY_FILTERS)
-    setApplied(EMPTY_FILTERS)
+    setFilters(EMPTY_FILTERS)
     dispatch(setSearch(''))
     setPage(1)
   }
@@ -150,8 +133,7 @@ export default function ProductListPage() {
     items.find((p) => p.title.toLowerCase().includes(q))?.thumbnail
 
   const searchType = (q) => {
-    setApplied(EMPTY_FILTERS)
-    setDraft(EMPTY_FILTERS)
+    setFilters(EMPTY_FILTERS)
     dispatch(setSearch(q))
     setPage(1)
     document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
@@ -163,31 +145,31 @@ export default function ProductListPage() {
     items[0]
 
   const activeChips = [
-    ...applied.categories.map((slug) => ({
+    ...filters.categories.map((slug) => ({
       key: `cat-${slug}`,
       label: catName(slug),
       clear: () =>
-        setApplied((a) => ({
-          ...a,
-          categories: a.categories.filter((c) => c !== slug),
+        setFilters((f) => ({
+          ...f,
+          categories: f.categories.filter((c) => c !== slug),
         })),
     })),
-    ...(applied.minRating > 0
+    ...(filters.minRating > 0
       ? [
           {
             key: 'rating',
-            label: `${applied.minRating} stars & up`,
-            clear: () => setApplied((a) => ({ ...a, minRating: 0 })),
+            label: `${filters.minRating} stars & up`,
+            clear: () => setFilters((f) => ({ ...f, minRating: 0 })),
           },
         ]
       : []),
-    ...(applied.minPrice !== '' || applied.maxPrice !== ''
+    ...(filters.minPrice !== '' || filters.maxPrice !== ''
       ? [
           {
             key: 'price',
-            label: `$${applied.minPrice || '0'}–$${applied.maxPrice || '∞'}`,
+            label: `$${filters.minPrice || '0'}–$${filters.maxPrice || '∞'}`,
             clear: () =>
-              setApplied((a) => ({ ...a, minPrice: '', maxPrice: '' })),
+              setFilters((f) => ({ ...f, minPrice: '', maxPrice: '' })),
           },
         ]
       : []),
@@ -262,9 +244,8 @@ export default function ProductListPage() {
 
           <div className={`catalog__sidebar${filtersOpen ? ' is-open' : ''}`}>
             <FiltersSidebar
-              draft={draft}
-              onChange={setDraft}
-              onApply={applyFilters}
+              filters={filters}
+              onChange={handleFilterChange}
               onClear={clearFilters}
             />
           </div>

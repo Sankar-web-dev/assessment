@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
 
   // Stepper is bound to the cart: 0 when absent, 1+ once added.
   const inCart = useSelector((s) =>
-    product ? s.cart.items[product.id] : null,
+    product ? s.cart.items.find((i) => i.id === product.id) : null,
   )
   const cartQty = inCart?.qty ?? 0
   const liked = useSelector((s) =>
@@ -145,7 +145,7 @@ export default function ProductDetailPage() {
         ) : (
           <>
             <nav className="breadcrumb" aria-label="Breadcrumb">
-              <Link to="/" className="breadcrumb__home" aria-label="Home">
+              <Link to="/landing" className="breadcrumb__home" aria-label="Home">
                 <Icon name="home" size={16} />
               </Link>
               <Icon name="chevronRight" size={12} />

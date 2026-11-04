@@ -42,6 +42,12 @@ class UserService
         return { user:userWithoutPassword, token };
     }
 
+    // Admin-only: all registered users (password is excluded by the schema).
+    async getAllUsers()
+    {
+        return User.find().sort({ createdAt: -1 });
+    }
+
     async logout()
     {
         return { message: "Logout successful" };

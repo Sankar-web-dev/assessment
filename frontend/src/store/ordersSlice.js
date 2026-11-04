@@ -84,7 +84,7 @@ export const {
 export const checkoutOrder = () => async (dispatch, getState) => {
   dispatch(checkoutStarted())
   const state = getState()
-  const items = Object.values(state.cart.items).map((i) => ({
+  const items = state.cart.items.map((i) => ({
     productId: i.id,
     quantity: i.qty,
   }))

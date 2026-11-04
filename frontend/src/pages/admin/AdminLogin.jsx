@@ -4,7 +4,7 @@ import { login, logout, clearAuthError } from '../../store/authSlice'
 
 // Admin-only sign in — there is no admin signup; the admin account is
 // provisioned on the backend (admin@gmail.com).
-export default function AdminLogin() {
+export default function AdminLogin({ header }) {
   const dispatch = useDispatch()
   const { status, error } = useSelector((s) => s.auth)
 
@@ -27,6 +27,7 @@ export default function AdminLogin() {
 
   return (
     <div className="admin__panel admin__panel--narrow admin__login">
+      {header}
       <h2 className="admin__panel-title">Admin sign in</h2>
       <p className="muted">
         Sign in to manage products, categories and coupons. Data is stored in

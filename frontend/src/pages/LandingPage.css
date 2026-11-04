@@ -309,6 +309,95 @@
   border-color: transparent;
 }
 
+/* ============ Tech stack ============ */
+.tech__row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.tech__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-3);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+.tech__card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary-600);
+  box-shadow: var(--glow-primary);
+}
+/* White tile keeps monochrome logos visible on dark theme too */
+.tech__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  background: #fff;
+  border: 1px solid var(--color-gray-100);
+}
+.tech__icon img {
+  width: 36px;
+  height: 36px;
+}
+.tech__card strong {
+  font: var(--text-label);
+}
+.tech__card .muted {
+  font-size: 12px;
+}
+
+/* ============ Developers ============ */
+.devs__row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.devs__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-4);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+.devs__card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary-600);
+  box-shadow: var(--glow-primary);
+}
+.devs__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-pill);
+  object-fit: cover;
+  margin-bottom: var(--space-3);
+  border: 3px solid var(--color-primary-100);
+}
+.devs__card strong {
+  font: var(--text-label);
+}
+.devs__card .muted {
+  font-size: 12px;
+}
+
 /* ============ Responsive ============ */
 @media (max-width: 900px) {
   .lhero__inner,
@@ -321,6 +410,11 @@
   .lcats__row {
     grid-template-columns: repeat(3, 1fr);
   }
+  .devs__row {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 560px;
+    margin-inline: auto;
+  }
   .lhero__check-card {
     position: static;
     margin-top: var(--space-4);
@@ -329,6 +423,13 @@
 @media (max-width: 480px) {
   .lcats__row {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .tech__row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .devs__row {
+    grid-template-columns: 1fr;
+    max-width: 360px;
   }
   .landing__featured-grid {
     grid-template-columns: 1fr;

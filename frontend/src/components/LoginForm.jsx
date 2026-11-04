@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, signup, clearAuthError } from '../store/authSlice'
 
-export default function LoginForm() {
+export default function LoginForm({ header }) {
   const dispatch = useDispatch()
   const { status, error } = useSelector((s) => s.auth)
 
@@ -23,6 +23,7 @@ export default function LoginForm() {
 
   return (
     <div className="admin__panel admin__panel--narrow admin__login">
+      {header}
       <h2 className="admin__panel-title">
         {mode === 'login' ? 'Sign in' : 'Create account'}
       </h2>

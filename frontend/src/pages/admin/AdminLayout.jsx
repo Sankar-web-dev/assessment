@@ -1,6 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { logout } from '../../store/authSlice'
+import { useSelector } from 'react-redux'
 import AdminLogin from './AdminLogin'
 import './admin.css'
 
@@ -9,10 +8,10 @@ const LINKS = [
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/coupons', label: 'Coupons' },
   { to: '/admin/orders', label: 'Orders' },
+  { to: '/admin/customers', label: 'Customers' },
 ]
 
 export default function AdminLayout() {
-  const dispatch = useDispatch()
   const { token, user } = useSelector((s) => s.auth)
 
   if (!token || user?.role !== 'admin') {
@@ -31,18 +30,11 @@ export default function AdminLayout() {
   return (
     <div className="page">
       <div className="container">
-        <div className="admin__head admin__head--row">
-          <h1 className="page-title">Admin</h1>
-          <div className="admin__user">
-            <span className="muted">{user?.name || user?.email}</span>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={() => dispatch(logout())}
-            >
-              Sign out
-            </button>
-          </div>
+        <div className="admin__head">
+          <h1 className="page-title">Admin Dashboard</h1>
+          <p className="muted">
+            Manage products, categories, coupons, orders and customers.
+          </p>
         </div>
         <nav className="admin__tabs">
           {LINKS.map((l) => (

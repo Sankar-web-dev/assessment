@@ -80,15 +80,18 @@
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
+/* Right-side controls: nav links, theme toggle, mobile cart + hamburger */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
 .header__nav {
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  margin-left: auto;
-}
-.header__nav--main {
-  margin-left: 0;
-  gap: var(--space-4);
 }
 .header__link {
   position: relative;
@@ -245,12 +248,6 @@
   box-shadow: var(--glow-cyan);
 }
 
-@media (max-width: 1024px) {
-  .header__nav--main {
-    display: none;
-  }
-}
-
 .header__cart--bar,
 .header__menu-btn {
   display: none;
@@ -270,11 +267,6 @@
   background: var(--chrome-field);
 }
 
-/* Category links duplicated in the dropdown for mobile — hidden on desktop */
-.header__link--mobile {
-  display: none;
-}
-
 /* ============ Tablet & mobile ============ */
 @media (max-width: 900px) {
   .header {
@@ -288,15 +280,12 @@
     padding-block: var(--space-3);
   }
 
-  /* Bar: logo · cart icon · hamburger  /  Row 2: search */
+  /* Bar: logo · [actions] cart icon · theme · hamburger  /  Row 2: search */
   .header__cart--bar {
     display: flex;
-    margin-left: auto;
-    order: 2;
   }
   .header__menu-btn {
     display: inline-flex;
-    order: 3;
   }
   .header__search {
     order: 4;
@@ -310,7 +299,6 @@
     top: 100%;
     left: 0;
     right: 0;
-    order: 5;
     display: none;
     flex-direction: column;
     align-items: stretch;
@@ -327,15 +315,9 @@
   .header__nav .header__link {
     padding: var(--space-3) var(--page-padding);
   }
-  .header__nav .header__link--mobile {
-    display: block;
-  }
   /* cart lives in the bar — don't duplicate it inside the menu */
   .header__nav .header__cart {
     display: none;
-  }
-  .header__nav .header__theme-toggle {
-    margin: var(--space-3) var(--page-padding) 0;
   }
   .header__nav .header__account {
     border-left: 0;

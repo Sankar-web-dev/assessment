@@ -9,10 +9,12 @@ import QuantityStepper from './QuantityStepper'
 import Icon from './Icon'
 import './ProductCard.css'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, showCart = true }) {
   const dispatch = useDispatch()
   const showToast = useToast()
-  const inCart = useSelector((s) => s.cart.items[product.id])
+  const inCart = useSelector((s) =>
+    s.cart.items.find((i) => i.id === product.id),
+  )
   const liked = useSelector((s) => Boolean(s.wishlist.items[product.id]))
 
   const toggleLike = (e) => {
@@ -83,27 +85,28 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {outOfStock ? (
-          <button type="button" className="btn btn--block" disabled>
-            Out of stock
-          </button>
-        ) : inCart ? (
-          <QuantityStepper
-            variant="cart"
-            value={inCart.qty}
-            max={product.stock}
-            onDecrease={() => dispatch(decrease(product.id))}
-            onIncrease={() => dispatch(increase(product.id))}
-          />
-        ) : (
-          <button
-            type="button"
-            className="btn btn--primary btn--block"
-            onClick={handleAdd}
-          >
-            Add to cart
-          </button>
-        )}
+        {showCart &&
+          (outOfStock ? (
+            <button type="button" className="btn btn--block" disabled>
+              Out of stock
+            </button>
+          ) : inCart ? (
+            <QuantityStepper
+              variant="cart"
+              value={inCart.qty}
+              max={product.stock}
+              onDecrease={() => dispatch(decrease(product.id))}
+              onIncrease={() => dispatch(increase(product.id))}
+            />
+          ) : (
+            <button
+              type="button"
+              className="btn btn--primary btn--block"
+              onClick={handleAdd}
+            >
+              Add to cart
+            </button>
+          ))}
       </div>
     </article>
   )

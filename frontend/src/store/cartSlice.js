@@ -3,11 +3,13 @@ import { api } from '../api/client'
 import { selectSubtotal } from './selectors'
 
 const initialState = {
-  // keyed by product id: { id, title, price, discountPercentage, thumbnail, stock, category, qty }
-  items: {},
+  // [{ id, title, price, sellingPrice, discountPercentage, thumbnail, stock, category, qty }]
+  items: [],
   coupon: null, // { code, percent }
   couponError: null,
 }
+
+const findItem = (state, id) => state.items.find((i) => i.id === id)
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -15,9 +17,12 @@ const cartSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const { product, qty = 1 } = action.payload
-      const existing = state.items[product.id]
-      const nextQty = (existing?.qty || 0) + qty
-      state.items[product.id] = {
+      const item = findItem(state, product.id)
+      if (item) {
+        item.qty = Math.min(item.qty + qty, product.stock ?? item.qty + qty)
+        return
+      }
+      state.items.push({
         id: product.id,
         title: product.title,
         price: product.price,
@@ -26,24 +31,27 @@ const cartSlice = createSlice({
         thumbnail: product.thumbnail,
         stock: product.stock,
         category: product.categoryName || product.category,
-        qty: Math.min(nextQty, product.stock ?? nextQty),
-      }
+        qty: Math.min(qty, product.stock ?? qty),
+      })
     },
     increase(state, action) {
-      const item = state.items[action.payload]
+      const item = findItem(state, action.payload)
       if (item && item.qty < (item.stock ?? Infinity)) item.qty += 1
     },
     decrease(state, action) {
-      const item = state.items[action.payload]
+      const item = findItem(state, action.payload)
       if (!item) return
-      if (item.qty <= 1) delete state.items[action.payload]
-      else item.qty -= 1
+      if (item.qty <= 1) {
+        state.items = state.items.filter((i) => i.id !== action.payload)
+      } else {
+        item.qty -= 1
+      }
     },
     removeItem(state, action) {
-      delete state.items[action.payload]
+      state.items = state.items.filter((i) => i.id !== action.payload)
     },
     clearCart(state) {
-      state.items = {}
+      state.items = []
       state.coupon = null
       state.couponError = null
     },
@@ -73,7 +81,7 @@ export const {
   removeCoupon,
 } = cartSlice.actions
 
-
+// POST /api/v1/coupons/validate — applies the coupon or stores the error.
 export const applyCoupon = (rawCode) => async (dispatch, getState) => {
   const code = String(rawCode || '').trim().toUpperCase()
   if (!code) {
