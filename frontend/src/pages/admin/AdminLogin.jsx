@@ -46,6 +46,7 @@ export default function AdminLogin({ header }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="admin@voltnex.gg"
+            autoComplete="email"
             required
           />
         </div>
@@ -61,6 +62,7 @@ export default function AdminLogin({ header }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
+            autoComplete="current-password"
             required
           />
         </div>

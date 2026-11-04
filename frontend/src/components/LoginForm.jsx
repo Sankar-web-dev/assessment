@@ -45,6 +45,7 @@ export default function LoginForm({ header }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
+              autoComplete="name"
               required
             />
           </div>
@@ -61,6 +62,7 @@ export default function LoginForm({ header }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
+            autoComplete="email"
             required
           />
         </div>
@@ -76,6 +78,7 @@ export default function LoginForm({ header }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
+            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             required
           />
         </div>
