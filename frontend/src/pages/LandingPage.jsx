@@ -29,6 +29,26 @@ const SHOP_CATS = [
   { label: 'Laptops', q: 'laptop' },
 ]
 
+const DEVICON = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons'
+
+const TECH_STACK = [
+  { name: 'React', role: 'UI library', img: `${DEVICON}/react/react-original.svg` },
+  { name: 'Redux Toolkit', role: 'State management', img: `${DEVICON}/redux/redux-original.svg` },
+  { name: 'React Router', role: 'Routing', img: `${DEVICON}/reactrouter/reactrouter-original.svg` },
+  { name: 'Vite', role: 'Build tool', img: `${DEVICON}/vitejs/vitejs-original.svg` },
+  { name: 'Node.js', role: 'Runtime', img: `${DEVICON}/nodejs/nodejs-original.svg` },
+  { name: 'Express', role: 'REST API', img: `${DEVICON}/express/express-original.svg` },
+  { name: 'MongoDB', role: 'Database', img: `${DEVICON}/mongodb/mongodb-original.svg` },
+  { name: 'Mongoose', role: 'ODM', img: `${DEVICON}/mongoose/mongoose-original.svg` },
+]
+
+const DEVELOPERS = [
+  { name: 'Gomathysankar R', role: 'Full Stack Developer', img: 'https://i.pravatar.cc/200?img=12' },
+  { name: 'Shai', role: 'Frontend Developer', img: 'https://i.pravatar.cc/200?img=59' },
+  { name: 'Monisha', role: 'Backend Developer', img: 'https://i.pravatar.cc/200?img=47' },
+  { name: 'Sharvani', role: 'UI/UX Designer', img: 'https://i.pravatar.cc/200?img=45' },
+]
+
 export default function LandingPage() {
   const dispatch = useDispatch()
   const items = useSelector(selectAllProducts)
@@ -151,7 +171,7 @@ export default function LandingPage() {
         </div>
         <div className="landing__featured-grid">
           {featured.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p.id} product={p} showCart={false} />
           ))}
         </div>
       </section>
@@ -213,6 +233,49 @@ export default function LandingPage() {
               </Link>
             )
           })}
+        </div>
+      </section>
+
+      {/* ============ Tech stack ============ */}
+      <section className="container landing__section">
+        <div className="landing__section-head">
+          <h2 className="landing__title">
+            Built <span>With</span>
+          </h2>
+        </div>
+        <div className="tech__row">
+          {TECH_STACK.map((t) => (
+            <div key={t.name} className="tech__card">
+              <span className="tech__icon">
+                <img src={t.img} alt={t.name} loading="lazy" />
+              </span>
+              <strong>{t.name}</strong>
+              <span className="muted">{t.role}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ============ Developers ============ */}
+      <section className="container landing__section">
+        <div className="landing__section-head">
+          <h2 className="landing__title">
+            Meet the <span>Developers</span>
+          </h2>
+        </div>
+        <div className="devs__row">
+          {DEVELOPERS.map((d) => (
+            <div key={d.name} className="devs__card">
+              <img
+                className="devs__avatar"
+                src={d.img}
+                alt={d.name}
+                loading="lazy"
+              />
+              <strong>{d.name}</strong>
+              <span className="muted">{d.role}</span>
+            </div>
+          ))}
         </div>
       </section>
 

@@ -31,7 +31,10 @@ export default function AdminLayout() {
     <div className="page">
       <div className="container">
         <div className="admin__head">
-          <h1 className="page-title">Admin</h1>
+          <h1 className="page-title">Admin Dashboard</h1>
+          <p className="muted">
+            Manage products, categories, coupons, orders and customers.
+          </p>
         </div>
         <nav className="admin__tabs">
           {LINKS.map((l) => (

@@ -11,7 +11,7 @@ export default function AdminCustomers() {
   useEffect(() => {
     api('/users', { token })
       .then((data) => {
-        setUsers(data)
+        setUsers(data.filter((u) => u.role !== 'admin'))
         setStatus('succeeded')
       })
       .catch(() => setStatus('failed'))
@@ -22,7 +22,7 @@ export default function AdminCustomers() {
       <div className="admin__panel-head">
         <div>
           <h2 className="admin__panel-title">Customers</h2>
-          <p className="muted">{users.length} registered users</p>
+          <p className="muted">{users.length} registered customers</p>
         </div>
       </div>
 
