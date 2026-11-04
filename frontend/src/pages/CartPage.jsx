@@ -260,7 +260,7 @@ export default function CartPage() {
               <p className="field-error">{checkoutError}</p>
             )}
             <p className="summary__note muted">
-              Prices in INR.
+              Prices in USD.
             </p>
           </aside>
         </div>

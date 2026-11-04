@@ -109,7 +109,7 @@ export default function AdminCoupons() {
           className="input"
           type="number"
           min="0"
-          placeholder="Min order ₹"
+          placeholder="Min order $"
           value={minOrder}
           onChange={(e) => setMinOrder(e.target.value)}
           style={{ maxWidth: 120 }}

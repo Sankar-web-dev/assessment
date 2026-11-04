@@ -359,7 +359,7 @@ export default function ProductDetailPage() {
                     <Icon name="truck" size={20} />
                     <div>
                       <strong>Free Shipping</strong>
-                      <span className="muted">on orders over ₹50</span>
+                      <span className="muted">on orders over $50</span>
                     </div>
                   </div>
                   <div className="pdetail__perk">

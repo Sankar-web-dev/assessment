@@ -167,7 +167,7 @@ export default function ProductListPage() {
       ? [
           {
             key: 'price',
-            label: `₹${filters.minPrice || '0'}–₹${filters.maxPrice || '∞'}`,
+            label: `$${filters.minPrice || '0'}–$${filters.maxPrice || '∞'}`,
             clear: () =>
               setFilters((f) => ({ ...f, minPrice: '', maxPrice: '' })),
           },
