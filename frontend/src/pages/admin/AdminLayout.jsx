@@ -4,6 +4,7 @@ import AdminLogin from './AdminLogin'
 import './admin.css'
 
 const LINKS = [
+  { to: '/admin/analytics', label: 'Analytics' },
   { to: '/admin/products', label: 'Products' },
   { to: '/admin/categories', label: 'Categories' },
   { to: '/admin/coupons', label: 'Coupons' },

@@ -19,6 +19,7 @@ import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminCustomers from './pages/admin/AdminCustomers'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
 import RequireAuth from './components/RequireAuth'
 import RequireAdmin from './components/RequireAdmin'
 
@@ -83,7 +84,7 @@ export default function App() {
                       </RequireAdmin>
                     }
                   >
-                    <Route index element={<Navigate to="/admin/products" replace />} />
+                    <Route index element={<Navigate to="/admin/analytics" replace />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="products/new" element={<AdminProductForm />} />
                     <Route path="products/:id/edit" element={<AdminProductForm />} />
@@ -91,6 +92,7 @@ export default function App() {
                     <Route path="coupons" element={<AdminCoupons />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="customers" element={<AdminCustomers />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
                   </Route>
                   <Route path="*" element={<Navigate to="/landing" replace />} />
                 </Routes>

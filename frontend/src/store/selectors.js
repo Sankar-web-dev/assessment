@@ -27,7 +27,7 @@ export const selectCouponDiscount = (state) =>
     ? round2((selectSubtotal(state) * state.cart.coupon.percent) / 100)
     : 0
 
-// Shipping is FREE when the subtotal is $50 or more, otherwise $4.99.
+// Shipping is FREE when the subtotal is ₹50 or more, otherwise ₹4.99.
 // (matches the backend pricing rules in doodlebackend/utils/pricing.js)
 export const selectShipping = (state) => {
   const subtotal = selectSubtotal(state)

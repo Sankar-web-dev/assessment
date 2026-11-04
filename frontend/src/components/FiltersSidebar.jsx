@@ -11,9 +11,9 @@ export const RATING_OPTIONS = [
 
 const PRICE_RANGES = [
   { label: 'All prices', min: '', max: '' },
-  { label: '$0 – $50', min: '0', max: '50' },
-  { label: '$50 – $100', min: '50', max: '100' },
-  { label: '$100+', min: '100', max: '' },
+  { label: '₹0 – ₹50', min: '0', max: '50' },
+  { label: '₹50 – ₹100', min: '50', max: '100' },
+  { label: '₹100+', min: '100', max: '' },
 ]
 
 export default function FiltersSidebar({ filters, onChange, onClear }) {
