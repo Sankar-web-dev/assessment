@@ -11,6 +11,7 @@ import {
 } from 'redux-persist'
 import productsReducer from './productsSlice'
 import cartReducer from './cartSlice'
+import wishlistReducer from './wishlistSlice'
 import authReducer from './authSlice'
 import ordersReducer from './ordersSlice'
 
@@ -29,6 +30,12 @@ const cartPersistConfig = {
   whitelist: ['items', 'coupon'],
 }
 
+const wishlistPersistConfig = {
+  key: 'voltnex-wishlist',
+  storage,
+  whitelist: ['items'],
+}
+
 const authPersistConfig = {
   key: 'kadai-auth',
   storage,
@@ -39,6 +46,7 @@ const store = configureStore({
   reducer: {
     products: productsReducer,
     cart: persistReducer(cartPersistConfig, cartReducer),
+    wishlist: persistReducer(wishlistPersistConfig, wishlistReducer),
     auth: persistReducer(authPersistConfig, authReducer),
     orders: ordersReducer,
   },

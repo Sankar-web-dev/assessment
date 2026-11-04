@@ -8,6 +8,7 @@ import {
 } from '../store/productsSlice'
 import { selectAllProducts } from '../store/selectors'
 import { addToCart, increase, decrease } from '../store/cartSlice'
+import { toggleWishlist } from '../store/wishlistSlice'
 import { discountedPrice, money } from '../utils/money'
 import { useToast } from '../components/Toast'
 import RatingStars from '../components/RatingStars'
@@ -104,6 +105,9 @@ export default function ProductDetailPage() {
     product ? s.cart.items[product.id] : null,
   )
   const cartQty = inCart?.qty ?? 0
+  const liked = useSelector((s) =>
+    product ? Boolean(s.wishlist.items[product.id]) : false,
+  )
 
   const stepUp = () => {
     if (inCart) dispatch(increase(product.id))
@@ -172,6 +176,15 @@ export default function ProductDetailPage() {
                       -{discountPct}%
                     </span>
                   )}
+                  <button
+                    type="button"
+                    className={`card__wish pdetail__wish${liked ? ' is-liked' : ''}`}
+                    onClick={() => dispatch(toggleWishlist(product))}
+                    aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+                    aria-pressed={liked}
+                  >
+                    <Icon name="heart" size={16} filled={liked} />
+                  </button>
                   <img src={images[imgIndex]} alt={product.title} />
                   <span className="pdetail__img-count caption">
                     {imgIndex + 1} / {images.length}

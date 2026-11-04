@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart, increase, decrease } from '../store/cartSlice'
+import { toggleWishlist } from '../store/wishlistSlice'
 import { discountedPrice, money } from '../utils/money'
 import { useToast } from './Toast'
 import RatingStars from './RatingStars'
@@ -9,32 +9,15 @@ import QuantityStepper from './QuantityStepper'
 import Icon from './Icon'
 import './ProductCard.css'
 
-const WISHLIST_KEY = 'voltnex-wishlist'
-
-const loadWishlist = () => {
-  try {
-    return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []
-  } catch {
-    return []
-  }
-}
-
 export default function ProductCard({ product }) {
   const dispatch = useDispatch()
   const showToast = useToast()
   const inCart = useSelector((s) => s.cart.items[product.id])
-  const [liked, setLiked] = useState(() =>
-    loadWishlist().includes(product.id),
-  )
+  const liked = useSelector((s) => Boolean(s.wishlist.items[product.id]))
 
   const toggleLike = (e) => {
     e.preventDefault()
-    const list = loadWishlist()
-    const next = liked
-      ? list.filter((id) => id !== product.id)
-      : [...list, product.id]
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(next))
-    setLiked(!liked)
+    dispatch(toggleWishlist(product))
   }
 
   const discounted = discountedPrice(product)

@@ -16,6 +16,7 @@ const NAV = [
 
 export default function Header() {
   const count = useSelector(selectCartItemCount)
+  const wishCount = useSelector((s) => Object.keys(s.wishlist.items).length)
   const search = useSelector((s) => s.products.search)
   const { token, user } = useSelector((s) => s.auth)
   const isAdmin = user?.role === 'admin'
@@ -119,6 +120,11 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+          {!isAdmin && (
+            <NavLink to="/wishlist" className="header__link" onClick={closeMenu}>
+              Wishlist
+            </NavLink>
+          )}
           {!isAdmin && token && (
             <NavLink to="/orders" className="header__link" onClick={closeMenu}>
               Orders
@@ -127,6 +133,15 @@ export default function Header() {
           <NavLink to="/admin" className="header__link" onClick={closeMenu}>
             Admin
           </NavLink>
+          {!isAdmin && (
+            <NavLink to="/wishlist" className="header__cart" onClick={closeMenu} aria-label="Wishlist">
+              <Icon name="heart" size={20} />
+              <span>Wishlist</span>
+              {wishCount > 0 && (
+                <span className="header__cart-count">{wishCount}</span>
+              )}
+            </NavLink>
+          )}
           {!isAdmin && (
             <NavLink to="/cart" className="header__cart" onClick={closeMenu}>
               <Icon name="cart" size={20} />

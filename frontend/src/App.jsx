@@ -9,6 +9,7 @@ import LandingPage from './pages/LandingPage'
 import ProductListPage from './pages/ProductListPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
+import WishlistPage from './pages/WishlistPage'
 import LoginPage from './pages/LoginPage'
 import OrdersPage from './pages/OrdersPage'
 import AdminLayout from './pages/admin/AdminLayout'
@@ -33,6 +34,7 @@ export default function App() {
                   <Route path="/products" element={<ProductListPage />} />
                   <Route path="/product/:id" element={<ProductDetailPage />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/orders" element={<OrdersPage />} />
                   <Route path="/admin" element={<AdminLayout />}>
